@@ -3,6 +3,16 @@
 @section('page-title', 'Inventory Dashboard')
 @section('page-subtitle', now()->format('l, d F Y'))
 @section('content')
+@php $tenant = auth()->user()->tenant; @endphp
+
+@if($tenant->productLimit() !== null)
+    <div class="mb-4 text-sm text-gray-600">
+        Products: {{ $products->count() }} / {{ $tenant->productLimit() }}
+        @if($tenant->hasReachedProductLimit())
+            <span class="text-red-600 font-medium">— Limit reached! Upgrade to add more.</span>
+        @endif
+    </div>
+@endif
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
     
     <!-- Total Products -->

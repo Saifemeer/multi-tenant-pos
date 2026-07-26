@@ -898,7 +898,7 @@
                         <li class="flex items-center gap-2 text-sm" style="color: var(--text-secondary);"><svg class="w-4 h-4 flex-shrink-0" style="color: var(--check-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Inventory Tracking</li>
                         <li class="flex items-center gap-2 text-sm" style="color: var(--text-secondary);"><svg class="w-4 h-4 flex-shrink-0" style="color: var(--check-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Email Support</li>
                     </ul>
-                    <a href="{{ route('business.register') }}" class="btn-secondary w-full justify-center text-center">Get Started</a>
+                    <a href="{{ route('business.register', ['plan' => 'starter']) }}" class="btn-secondary w-full justify-center text-center">Get Started</a>
                 </div>
 
                 <!-- Business -->
@@ -913,7 +913,7 @@
                         <li class="flex items-center gap-2 text-sm" style="color: var(--text-secondary);"><svg class="w-4 h-4 flex-shrink-0" style="color: var(--check-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Priority Support</li>
                         <li class="flex items-center gap-2 text-sm" style="color: var(--text-secondary);"><svg class="w-4 h-4 flex-shrink-0" style="color: var(--check-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Multi-User Access</li>
                     </ul>
-                    <a href="{{ route('business.register') }}" class="btn-primary w-full justify-center text-center">Choose Business</a>
+                    <a href="{{ route('business.register', ['plan' => 'business']) }}" class="btn-primary w-full justify-center text-center">Choose Business</a>
                 </div>
 
                 <!-- Enterprise -->
@@ -928,7 +928,7 @@
                         <li class="flex items-center gap-2 text-sm" style="color: var(--text-secondary);"><svg class="w-4 h-4 flex-shrink-0" style="color: var(--check-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Dedicated Account Manager</li>
                         <li class="flex items-center gap-2 text-sm" style="color: var(--text-secondary);"><svg class="w-4 h-4 flex-shrink-0" style="color: var(--check-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>24/7 Phone Support</li>
                     </ul>
-                    <a href="{{ route('business.register') }}" class="btn-secondary w-full justify-center text-center">Contact Sales</a>
+                    <a href="{{ route('business.register', ['plan' => 'enterprise']) }}" class="btn-secondary w-full justify-center text-center">Contact Sales</a>
                 </div>
             </div>
         </div>

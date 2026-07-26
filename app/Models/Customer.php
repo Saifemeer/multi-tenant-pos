@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
 class Customer extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToTenant;
 
     protected $fillable = [
         'tenant_id',
@@ -25,21 +24,6 @@ class Customer extends Model
     protected $casts = [
         'total_spent' => 'decimal:2',
     ];
-
-    protected static function booted()
-    {
-        static::addGlobalScope('tenant', function (Builder $builder) {
-            if (Auth::check() && Auth::user()->tenant_id) {
-                $builder->where('customers.tenant_id', Auth::user()->tenant_id);
-            }
-        });
-
-        static::creating(function ($customer) {
-            if (Auth::check() && !$customer->tenant_id) {
-                $customer->tenant_id = Auth::user()->tenant_id;
-            }
-        });
-    }
 
     public function tenant()
     {

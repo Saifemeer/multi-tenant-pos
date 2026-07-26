@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToTenant;
 
     protected $fillable = [
         'tenant_id',
@@ -34,23 +36,24 @@ class Order extends Model
 
     protected static function booted()
     {
-        static::addGlobalScope('tenant', function (Builder $builder) {
-            if (Auth::check() && Auth::user()->tenant_id) {
-                $builder->where('orders.tenant_id', Auth::user()->tenant_id);
+        static::creating(function ($order) {
+            if (!$order->order_number) {
+                $order->order_number = static::generateOrderNumber($order->tenant_id);
             }
         });
+    }
 
-        static::creating(function ($order) {
-            if (Auth::check() && !$order->tenant_id) {
-                $order->tenant_id = Auth::user()->tenant_id;
-            }
-            // Auto-generate order number
-            if (!$order->order_number) {
-                $order->order_number = 'ORD-' . date('Y') . '-' . str_pad(
-                    Order::withoutGlobalScopes()->count() + 1,
-                    4, '0', STR_PAD_LEFT
-                );
-            }
+    // Tenant-specific order number, race-condition safe
+    protected static function generateOrderNumber(int $tenantId): string
+    {
+        return DB::transaction(function () use ($tenantId) {
+            // lockForUpdate se concurrent requests mein duplicate number nahi banega
+            $count = static::withoutGlobalScope('tenant')
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->count();
+
+            return 'ORD-' . date('Y') . '-' . str_pad($count + 1, 4, '0', STR_PAD_LEFT);
         });
     }
 

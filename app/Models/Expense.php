@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
 class Expense extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToTenant;
 
     protected $fillable = [
         'tenant_id',
@@ -29,15 +28,8 @@ class Expense extends Model
 
     protected static function booted()
     {
-        static::addGlobalScope('tenant', function (Builder $builder) {
-            if (Auth::check() && Auth::user()->tenant_id) {
-                $builder->where('expenses.tenant_id', Auth::user()->tenant_id);
-            }
-        });
-
         static::creating(function ($expense) {
-            if (Auth::check() && !$expense->tenant_id) {
-                $expense->tenant_id = Auth::user()->tenant_id;
+            if (Auth::check() && !$expense->user_id) {
                 $expense->user_id = Auth::user()->id;
             }
         });

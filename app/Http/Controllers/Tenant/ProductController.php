@@ -27,6 +27,16 @@ class ProductController extends Controller
     // ============================================
     public function store(Request $request)
     {
+        $tenant = auth()->user()->tenant;
+
+        // ✅ Plan-based product limit check
+        if ($tenant->hasReachedProductLimit()) {
+            return redirect()->back()->with(
+                'error',
+                'Aapki "' . ucfirst($tenant->subscription_plan) . '" plan mein sirf ' . $tenant->productLimit() . ' products allowed hain. Zyada products add karne ke liye plan upgrade karein.'
+            );
+        }
+        
         $request->validate([
             'name'          => 'required|string|max:255',
             'category_id' => [

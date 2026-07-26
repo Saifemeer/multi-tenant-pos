@@ -14,13 +14,16 @@ class Tenant extends Model
         'business_category',
         'slug',
         'email',
-        'phone',         // ✅ space hata diya
-        'logo',          // ✅ ADDED
-        'address',       // ✅ ADDED
-        'currency',      // ✅ ADDED
-        'subscription_plan', // ✅ ADDED
-        'is_active',     // ✅ ADDED
-        'trial_ends_at', // ✅ ADDED
+        'phone',
+        'logo',
+        'address',
+        'currency',
+        'subscription_plan',
+        'stripe_customer_id',
+        'stripe_subscription_id',
+        'subscription_status',
+        'is_active',
+        'trial_ends_at',
     ];
 
     protected $casts = [
@@ -34,58 +37,122 @@ class Tenant extends Model
 
     public function users()
     {
-        return $this->hasMany(User::class); // ✅ uppercase User
+        return $this->hasMany(User::class);
     }
 
     public function products()
     {
-        return $this->hasMany(Product::class); // ✅ ADDED
+        return $this->hasMany(Product::class);
     }
 
     public function categories()
     {
-        return $this->hasMany(Category::class); // ✅ ADDED
+        return $this->hasMany(Category::class);
     }
 
     public function customers()
     {
-        return $this->hasMany(Customer::class); // ✅ ADDED
+        return $this->hasMany(Customer::class);
     }
 
     public function orders()
     {
-        return $this->hasMany(Order::class); // ✅ ADDED
+        return $this->hasMany(Order::class);
     }
 
     public function expenses()
     {
-        return $this->hasMany(Expense::class); // ✅ ADDED
-    }
-
-    public function subscription()
-    {
-        return $this->hasOne(TenantSubscription::class)->latest(); // ✅ ADDED
+        return $this->hasMany(Expense::class);
     }
 
     // ============================================
     // HELPERS
     // ============================================
+// ✅ Plan ki config nikalo
+    public function planConfig(): array
+    {
+        return config('plans.' . $this->subscription_plan, config('plans.starter'));
+    }
 
-    // Tenant active hai ya nahi
+    // ✅ Product limit check karo
+    public function hasReachedProductLimit(): bool
+    {
+        $limit = $this->planConfig()['max_products'];
+
+        if ($limit === null) {
+            return false; // unlimited
+        }
+
+        return $this->products()->count() >= $limit;
+    }
+
+    public function productLimit(): ?int
+    {
+        return $this->planConfig()['max_products'];
+    }
+
+    // ✅ Reports access check karo
+    public function canAccessReports(): bool
+    {
+        return $this->planConfig()['reports'] === true;
+    }
+    // ✅ Staff limit reach ho gayi hai kya
+    public function hasReachedUserLimit(): bool
+    {
+        $limit = $this->planConfig()['max_users'];
+
+        if ($limit === null) {
+            return false;
+        }
+
+        return $this->users()->count() >= $limit;
+    }
+
+    public function userLimit(): ?int
+    {
+        return $this->planConfig()['max_users'];
+    }
+
+    // ✅ Starter plan mein bilkul staff add nahi kar sakte
+    public function canManageStaff(): bool
+    {
+        return $this->userLimit() !== 1;
+    }
+    
     public function isActive(): bool
     {
         return $this->is_active;
     }
 
-    // Trial mein hai ya nahi
     public function isOnTrial(): bool
     {
         return $this->trial_ends_at && $this->trial_ends_at->isFuture();
     }
 
-    // Plan check karna
     public function hasPlan(string $plan): bool
     {
         return $this->subscription_plan === $plan;
+    }
+
+    // ✅ Free plan hai ya paid
+    public function isFreePlan(): bool
+    {
+        return $this->subscription_plan === 'starter';
+    }
+
+    // ✅ Subscription active/valid hai (paid plans ke liye)
+    public function hasActiveSubscription(): bool
+    {
+        return in_array($this->subscription_status, ['trialing', 'active']);
+    }
+
+    // ✅ Plan ki Stripe Price ID nikalo
+    public function stripePriceId(): ?string
+    {
+        return match ($this->subscription_plan) {
+            'business'   => config('services.stripe.prices.business'),
+            'enterprise' => config('services.stripe.prices.enterprise'),
+            default      => null,
+        };
     }
 }

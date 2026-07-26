@@ -15,6 +15,14 @@ class ReportController extends Controller
      */
     public function index(Request $request)
     {
+         
+        $tenant = auth()->user()->tenant;
+
+        if (!$tenant->canAccessReports()) {
+            return redirect()->route('tenant.dashboard')
+                ->with('error', 'Reports & Analytics sirf Business ya Enterprise plan mein available hai. Apna plan upgrade karein.');
+        }
+
         $todayRevenue = Order::completed()
             ->whereDate('created_at', today())
             ->sum('total');

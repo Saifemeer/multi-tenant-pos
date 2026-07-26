@@ -229,7 +229,39 @@
                         <p class="text-red-400 text-xs mt-2">{{ $message }}</p>
                     @enderror
                 </div>
+<!-- Input Component: Subscription Plan -->
+                <div>
+                    <label class="block text-xs font-bold tracking-wider uppercase mb-3" style="color: var(--text-muted);">Choose Your Plan</label>
 
+                   <input type="hidden" name="subscription_plan" id="subscription_plan" value="{{ old('subscription_plan', request('plan', 'starter')) }}" required>
+
+                    <div class="grid grid-cols-3 gap-3" id="planGrid">
+                       <div class="category-card {{ old('subscription_plan', request('plan', 'starter')) == 'starter' ? 'selected' : '' }}"
+     onclick="selectPlan('starter', this)">
+                            <p class="text-xs font-bold" style="color: var(--text-main);">Starter</p>
+                            <p class="text-lg font-black mt-1" style="color: var(--text-main);">Free</p>
+                            <p class="text-[10px] mt-1" style="color: var(--text-muted);">Up to 50 products</p>
+                        </div>
+
+                        <div class="category-card {{ old('subscription_plan', request('plan')) == 'business' ? 'selected' : '' }}"
+     onclick="selectPlan('business', this)">
+                            <p class="text-xs font-bold" style="color: var(--text-main);">Business</p>
+                            <p class="text-lg font-black mt-1" style="color: var(--text-main);">$29<span class="text-[10px] font-normal">/mo</span></p>
+                            <p class="text-[10px] mt-1" style="color: var(--text-muted);">Unlimited + reports</p>
+                        </div>
+
+                        <div class="category-card {{ old('subscription_plan', request('plan')) == 'enterprise' ? 'selected' : '' }}"
+     onclick="selectPlan('enterprise', this)">
+                            <p class="text-xs font-bold" style="color: var(--text-main);">Enterprise</p>
+                            <p class="text-lg font-black mt-1" style="color: var(--text-main);">$99<span class="text-[10px] font-normal">/mo</span></p>
+                            <p class="text-[10px] mt-1" style="color: var(--text-muted);">Multi-store</p>
+                        </div>
+                    </div>
+
+                    @error('subscription_plan')
+                        <p class="text-red-400 text-xs mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
                 <!-- Input Component: Owner Name -->
                 <div>
                     <label class="block text-xs font-bold tracking-wider uppercase mb-2" style="color: var(--text-muted);">Owner Name</label>
@@ -325,7 +357,14 @@
             });
             element.classList.add('selected');
         }
-
+// Plan Selection Handler
+        function selectPlan(value, element) {
+            document.getElementById('subscription_plan').value = value;
+            document.querySelectorAll('#planGrid .category-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
         // Realtime Universal Theme Synchronizer Engine
         function toggleTheme() {
             const html = document.getElementById('html-theme');

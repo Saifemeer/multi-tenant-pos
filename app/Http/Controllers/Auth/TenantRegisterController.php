@@ -10,6 +10,11 @@ use App\Models\User;
 use App\Models\Category;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Stripe\Stripe;
+use Stripe\Checkout\Session as StripeSession;
+use Stripe\Customer as StripeCustomer;
 
 class TenantRegisterController extends Controller
 {
@@ -26,49 +31,126 @@ class TenantRegisterController extends Controller
         $request->validate([
             'company_name'      => 'required|string|max:255',
             'business_category' => 'required|string|max:255',
+            'subscription_plan' => 'required|in:starter,business,enterprise',
             'name'              => 'required|string|max:255',
             'email'             => 'required|string|email|max:255|unique:users',
             'password'          => 'required|string|min:8|confirmed',
         ]);
 
-        $slug = Str::slug($request->company_name);
+        $isFreePlan = $request->subscription_plan === 'starter';
 
-        if (Tenant::where('slug', $slug)->exists()) {
-            $slug = $slug . '-' . Str::random(5);
+        // ✅ Agar paid plan hai, Stripe se pehle Customer bana lo — DB mein kuch save karne se pehle
+        // Isse agar Stripe fail ho, toh database mein kuch bhi create hi nahi hoga
+        $stripeCustomerId = null;
+
+        if (!$isFreePlan) {
+            try {
+                Stripe::setApiKey(config('services.stripe.secret'));
+
+                $customer = StripeCustomer::create([
+                    'email' => $request->email,
+                    'name'  => $request->company_name,
+                ]);
+
+                $stripeCustomerId = $customer->id;
+            } catch (\Exception $e) {
+                Log::error('Stripe customer creation failed: ' . $e->getMessage());
+
+                return back()->withErrors([
+                    'email' => 'Payment system se connect nahi ho paya. Thodi der baad try karein ya Starter (free) plan choose karein.',
+                ])->withInput();
+            }
         }
 
-        // ✅ Tenant banao with business category
-        $tenant = Tenant::create([
-            'company_name'      => $request->company_name,
-            'business_category' => $request->business_category,
-            'slug'              => $slug,
-            'email'             => $request->email,
-            'phone'             => $request->phone ?? null,
-            'currency'          => 'PKR',
-            'is_active'         => true,
-            'trial_ends_at'     => now()->addDays(14),
-        ]);
+        // ✅ Ab DB transaction ke andar tenant + user + categories banao
+        try {
+            [$tenant, $user] = DB::transaction(function () use ($request, $isFreePlan, $stripeCustomerId) {
 
-        // ✅ Admin user banao
-        $user = User::create([
-            'tenant_id' => $tenant->id,
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'password'  => Hash::make($request->password),
-            'role'      => 'admin',
-            'is_active' => true,
-        ]);
+                $slug = Str::slug($request->company_name);
+                if (Tenant::where('slug', $slug)->exists()) {
+                    $slug = $slug . '-' . Str::random(5);
+                }
 
-        // ✅ Default categories banao based on business type
-        $this->createDefaultCategories($tenant, $request->business_category);
+                $tenant = Tenant::create([
+                    'company_name'         => $request->company_name,
+                    'business_category'    => $request->business_category,
+                    'slug'                 => $slug,
+                    'email'                => $request->email,
+                    'phone'                => $request->phone ?? null,
+                    'currency'             => 'PKR',
+                    'subscription_plan'    => $request->subscription_plan,
+                    'subscription_status'  => $isFreePlan ? 'active' : 'trialing',
+                    'stripe_customer_id'   => $stripeCustomerId,
+                    'is_active'            => true,
+                    'trial_ends_at'        => $isFreePlan ? null : now()->addDays(14),
+                ]);
+
+                $user = User::create([
+                    'tenant_id' => $tenant->id,
+                    'name'      => $request->name,
+                    'email'     => $request->email,
+                    'password'  => Hash::make($request->password),
+                    'role'      => 'admin',
+                    'is_active' => true,
+                ]);
+
+                $this->createDefaultCategories($tenant, $request->business_category);
+
+                return [$tenant, $user];
+            });
+        } catch (\Exception $e) {
+            Log::error('Tenant registration failed: ' . $e->getMessage());
+
+            return back()->withErrors([
+                'email' => 'Registration mein masla hua. Dubara try karein.',
+            ])->withInput();
+        }
 
         Auth::login($user);
 
-        return redirect()->route('tenant.dashboard')
-            ->with('success', 'Your business "' . $tenant->company_name . '" has been registered successfully!');
+        if ($isFreePlan) {
+            return redirect()->route('tenant.dashboard')
+                ->with('success', 'Your business "' . $tenant->company_name . '" has been registered successfully!');
+        }
+
+        // ✅ Ab sirf Checkout Session create karni hai (tenant/user already DB mein safe hain)
+        try {
+            $session = StripeSession::create([
+                'customer'             => $tenant->stripe_customer_id,
+                'payment_method_types' => ['card'],
+                'line_items' => [[
+                    'price'    => $tenant->stripePriceId(),
+                    'quantity' => 1,
+                ]],
+                'mode' => 'subscription',
+                'subscription_data' => [
+                    'trial_period_days' => 14,
+                    'metadata' => [
+                        'tenant_id' => $tenant->id,
+                    ],
+                ],
+                'success_url' => route('subscription.success') . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url'  => route('subscription.cancel'),
+                'metadata' => [
+                    'tenant_id' => $tenant->id,
+                ],
+            ]);
+
+            return redirect($session->url);
+
+        } catch (\Exception $e) {
+            Log::error('Stripe checkout session failed: ' . $e->getMessage());
+
+            // Tenant/user already ban chuke hain (DB transaction mein) — unko free/trialing rehne do
+            // User ko dashboard bhej do, payment baad mein complete karne ka option de sakte ho
+            return redirect()->route('tenant.dashboard')
+                ->with('error', 'Account ban gaya hai, lekin payment page load nahi ho saka. Aap baad mein settings se subscription complete kar sakte hain.');
+        }
     }
 
-    // ✅ Business type ke hisaab se default categories banao
+    // ============================================
+    // Default Categories (same as before)
+    // ============================================
     private function createDefaultCategories(Tenant $tenant, string $businessType): void
     {
         $categoriesMap = [
