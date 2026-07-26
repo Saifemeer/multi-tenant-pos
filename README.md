@@ -1,59 +1,129 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Flash POS — Multi-Tenant Point of Sale SaaS
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A full-stack, multi-tenant Point of Sale (POS) platform built with Laravel. Businesses can register, choose a subscription plan, and manage their own isolated store — including inventory, sales, staff, and customers — all from a single codebase serving multiple tenants.
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🔗 Links
+- GitHub: [github.com/Saifemeer/multi-tenant-pos](https://github.com/Saifemeer/multi-tenant-pos)
+- LinkedIn: [linkedin.com/in/muhammad-saifullah11](https://www.linkedin.com/in/muhammad-saifullah11/)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## ✨ Key Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Multi-Tenancy
+- Single-database, shared-schema architecture using `tenant_id` scoping
+- Global Eloquent scopes (`BelongsToTenant` trait) automatically isolate every tenant's data — no query can accidentally leak data across businesses
+- Tenant-scoped order numbering, product catalogs, and reporting
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Subscription Billing (Stripe)
+- Three-tier pricing (Starter / Business / Enterprise) with Stripe Checkout
+- 14-day free trial on paid plans
+- Stripe Webhooks handle payment success, failure, and cancellation events — the app doesn't rely solely on redirect URLs, since payment confirmation comes directly from Stripe
+- Plan-based feature gating: product limits, staff limits, and analytics access are enforced server-side based on the tenant's active plan
 
-## Laravel Sponsors
+### Role-Based Access Control
+- Three roles per tenant: **Admin**, **Manager**, **Cashier**
+- Cashiers are restricted to the POS checkout screen only — no access to inventory, reports, or settings
+- Route-level middleware (`not.cashier`) and controller-level checks enforce permissions on both the backend and the UI
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Point of Sale
+- Fast product search and cart-based checkout
+- Real-time stock validation and deduction on sale
+- Multiple payment methods (Cash, Card, JazzCash, Easypaisa, Bank Transfer)
+- Automatic tenant-scoped, race-condition-safe order number generation
 
-### Premium Partners
+### Inventory & Business Management
+- Product catalog with categories, SKU/barcode, low-stock alerts, and profit margin calculations
+- Customer database with visit and spend tracking
+- Sales reports with revenue breakdowns (daily/weekly/monthly) and top-selling products, visualized with Chart.js
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Staff Management
+- Admins/Managers can invite staff (Manager or Cashier roles)
+- Staff limits enforced per subscription plan
 
-## Contributing
+### Super Admin Panel
+- Platform-wide dashboard separate from tenant dashboards
+- View all tenants, activate/deactivate accounts, monitor trial expirations and platform revenue
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Security
+- Mid-session account/tenant deactivation checks (a deactivated user or tenant is signed out immediately, not just blocked at login)
+- CSRF protection with a scoped exception for the Stripe webhook endpoint
+- Registration wrapped in a DB transaction — if Stripe setup fails, no orphaned tenant/user records are left behind
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🛠️ Tech Stack
 
-## Security Vulnerabilities
+| Layer | Technology |
+|---|---|
+| Backend | Laravel 12 (PHP 8.2) |
+| Database | MySQL |
+| Frontend | Blade, Tailwind CSS |
+| Payments | Stripe (Checkout, Subscriptions, Webhooks) |
+| Charts | Chart.js |
+| Auth | Laravel's built-in authentication |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 🏗️ Architecture Highlights
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**Tenant Isolation** — Every tenant-owned model uses a shared `BelongsToTenant` trait that applies a global Eloquent scope, automatically filtering all queries by the authenticated user's `tenant_id`, and auto-fills `tenant_id` on creation.
+
+**Plan-Based Gating** — Subscription limits (`config/plans.php`) are checked at the model level (`Tenant::hasReachedProductLimit()`, `hasReachedUserLimit()`, `canAccessReports()`) rather than hardcoded in controllers, making it easy to add or adjust plans.
+
+**Webhook-Driven Billing State** — Rather than trusting the browser redirect after checkout, subscription status (`trialing`, `active`, `past_due`, `canceled`) is updated via Stripe webhook events, matching how production billing systems behave.
+
+---
+
+## ⚙️ Local Setup
+
+```bash
+git clone https://github.com/Saifemeer/multi-tenant-pos.git
+cd multi-tenant-pos
+
+composer install
+npm install
+
+cp .env.example .env
+php artisan key:generate
+```
+
+Configure your `.env`:
+```
+DB_DATABASE=multi_tenant_pos
+DB_USERNAME=root
+DB_PASSWORD=
+
+STRIPE_KEY=pk_test_...
+STRIPE_SECRET=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_PRICE_BUSINESS=price_...
+STRIPE_PRICE_ENTERPRISE=price_...
+```
+
+```bash
+php artisan migrate
+php artisan serve
+npm run dev
+```
+
+For local Stripe webhook testing:
+```bash
+stripe listen --forward-to localhost:8000/stripe/webhook
+```
+
+---
+
+## 📌 Roadmap
+- [ ] Automated test coverage (PHPUnit/Pest)
+- [ ] Email notifications (staff invites, receipts)
+- [ ] Multi-store support for Enterprise tenants
+- [ ] Production deployment
+
+---
+
+## 👤 Author
+**Muhammad Saifullah** — Full Stack Developer (Laravel/PHP)
+[LinkedIn](https://www.linkedin.com/in/muhammad-saifullah11/) · [GitHub](https://github.com/Saifemeer/)
