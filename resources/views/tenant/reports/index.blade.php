@@ -6,23 +6,25 @@
 
 @section('content')
 
+@php $tenant = auth()->user()->tenant; @endphp
+
 <!-- Stats -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-fade-in">
     <div class="stat-card">
         <p class="text-xs font-semibold text-gray-500 uppercase">Today Revenue</p>
-        <p class="text-2xl font-black text-emerald-400 mt-2">Rs. {{ number_format($todayRevenue ?? 0) }}</p>
+        <p class="text-2xl font-black text-emerald-400 mt-2">{{ $tenant->formatMoney($todayRevenue ?? 0, 0) }}</p>
     </div>
     <div class="stat-card">
         <p class="text-xs font-semibold text-gray-500 uppercase">This Week</p>
-        <p class="text-2xl font-black text-blue-400 mt-2">Rs. {{ number_format($weekRevenue ?? 0) }}</p>
+        <p class="text-2xl font-black text-blue-400 mt-2">{{ $tenant->formatMoney($weekRevenue ?? 0, 0) }}</p>
     </div>
     <div class="stat-card">
         <p class="text-xs font-semibold text-gray-500 uppercase">This Month</p>
-        <p class="text-2xl font-black text-purple-400 mt-2">Rs. {{ number_format($monthRevenue ?? 0) }}</p>
+       <p class="text-2xl font-black text-purple-400 mt-2">{{ $tenant->formatMoney($monthRevenue ?? 0, 0) }}</p>
     </div>
     <div class="stat-card">
         <p class="text-xs font-semibold text-gray-500 uppercase">Total Revenue</p>
-        <p class="text-2xl font-black text-amber-400 mt-2">Rs. {{ number_format($totalRevenue ?? 0) }}</p>
+        <p class="text-2xl font-black text-amber-400 mt-2">{{ $tenant->formatMoney($totalRevenue ?? 0, 0) }}</p>
     </div>
 </div>
 
@@ -50,7 +52,7 @@
             </div>
             <div class="text-right">
                 <p class="text-sm font-bold text-white">{{ $product->total_sold ?? 0 }} sold</p>
-                <p class="text-xs text-gray-500">Rs. {{ number_format($product->price, 2) }}</p>
+                <p class="text-xs text-gray-500">{{ $tenant->formatMoney($product->price) }}</p>
             </div>
         </div>
         @empty
@@ -72,7 +74,7 @@ new Chart(ctx, {
     data: {
         labels: {!! json_encode($chartLabels ?? ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']) !!},
         datasets: [{
-            label: 'Revenue (Rs.)',
+            label: 'Revenue ({{ auth()->user()->tenant->currencySymbol() }})',
             data: {!! json_encode($chartData ?? [0,0,0,0,0,0,0]) !!},
             borderColor: '#3b82f6',
             backgroundColor: 'rgba(59,130,246,0.1)',

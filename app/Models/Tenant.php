@@ -69,6 +69,22 @@ class Tenant extends Model
     // HELPERS
     // ============================================
 // ✅ Plan ki config nikalo
+// ✅ Currency symbol nikalo
+    public function currencySymbol(): string
+    {
+        return match ($this->currency) {
+            'USD' => '$',
+            'AED' => 'AED',
+            default => 'Rs.',
+        };
+    }
+
+    // ✅ Formatted amount (symbol + number) — sabse zyada use hoga views mein
+    public function formatMoney($amount, int $decimals = 2): string
+    {
+        return $this->currencySymbol() . ' ' . number_format((float) $amount, $decimals);
+    }
+    
     public function planConfig(): array
     {
         return config('plans.' . $this->subscription_plan, config('plans.starter'));
@@ -118,7 +134,7 @@ class Tenant extends Model
     {
         return $this->userLimit() !== 1;
     }
-    
+
     public function isActive(): bool
     {
         return $this->is_active;
@@ -154,5 +170,7 @@ class Tenant extends Model
             'enterprise' => config('services.stripe.prices.enterprise'),
             default      => null,
         };
+
+        
     }
 }

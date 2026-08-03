@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\TenantRegisterController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Tenant\CategoryController;
 use App\Http\Controllers\Tenant\CustomerController;
 use App\Http\Controllers\Tenant\DashboardController;
@@ -11,8 +12,10 @@ use App\Http\Controllers\Tenant\ProductController;
 use App\Http\Controllers\Tenant\ReportController;
 use App\Http\Controllers\Tenant\SettingsController;
 use App\Http\Controllers\Tenant\StaffController;
+use App\Http\Controllers\Tenant\ExpenseController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\Tenant\ReceiptController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\TenantController as SuperAdminTenantController;
 
@@ -43,17 +46,32 @@ Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])
 // ============================================
 Route::middleware('guest')->group(function () {
 
+    // Register
     Route::get('/register-business', [TenantRegisterController::class, 'showRegisterForm'])
         ->name('business.register');
 
     Route::post('/register-business', [TenantRegisterController::class, 'register'])
         ->name('business.register.submit');
 
+    // Login
     Route::get('/login', [LoginController::class, 'showLoginForm'])
         ->name('login');
 
     Route::post('/login', [LoginController::class, 'login'])
         ->name('login.submit');
+
+    // Password Reset
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])
+        ->name('password.request');
+
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])
+        ->name('password.email');
+
+    Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])
+        ->name('password.reset');
+
+    Route::post('/reset-password', [ForgotPasswordController::class, 'reset'])
+        ->name('password.update');
 });
 
 // Logout (Auth required)
@@ -76,9 +94,29 @@ Route::middleware(['auth', 'tenant.active'])->prefix('tenant')->name('tenant.')-
     Route::post('/pos/checkout', [ProductController::class, 'checkout'])
         ->name('pos.checkout');
 
-    // ─── Sirf Admin/Manager access kar sakte hain ───────────────────
-    Route::middleware('not.cashier')->group(function () {
+    // Apni profile koi bhi edit kar sakta hai (khud ki)
+    Route::put('/settings/profile', [SettingsController::class, 'updateProfile'])
+        ->name('settings.profile');
 
+      // ✅ Orders — sab dekh sakte hain; refund koi bhi turant kar sakta hai (reason ke saath)
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/refund', [OrderController::class, 'refund'])->name('orders.refund');
+
+     // ✅ Refund audit log — sirf admin/manager
+    Route::get('/refund-logs', [OrderController::class, 'refundLogs'])->name('refund-logs.index');
+    Route::post('/refund-logs/{refundLog}/mark-reviewed', [OrderController::class, 'markReviewed'])->name('refund-logs.mark-reviewed');
+
+    // ✅ Receipt/Invoice PDF
+    Route::get('/orders/{order}/receipt', [ReceiptController::class, 'view'])->name('receipts.view');
+    Route::get('/orders/{order}/receipt/download', [ReceiptController::class, 'download'])->name('receipts.download');
+
+    // ─── Admin + Manager access kar sakte hain (operations) ───────
+    Route::middleware('not.cashier')->group(function () {
+// Expenses
+        Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index');
+        Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+        Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
         // Products
         Route::get('/products', [ProductController::class, 'index'])->name('products.index');
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
@@ -92,21 +130,23 @@ Route::middleware(['auth', 'tenant.active'])->prefix('tenant')->name('tenant.')-
         Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
         Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 
-        // Orders
-        Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-        Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-
         // Customers
         Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
         Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
+        Route::put('/customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
+        Route::delete('/customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
+        Route::post('/customers/{customer}/record-payment', [CustomerController::class, 'recordPayment'])->name('customers.record-payment');
 
         // Reports
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    });
 
-        // Settings
+    // ─── Sirf Admin access kar sakta hai (business-critical) ───────
+    Route::middleware('tenant.admin')->group(function () {
+
+        // Business Settings
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
-        Route::put('/settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.profile');
         Route::delete('/settings', [SettingsController::class, 'destroy'])->name('settings.destroy');
 
         // Staff
@@ -122,6 +162,12 @@ Route::middleware(['auth', 'tenant.active'])->prefix('tenant')->name('tenant.')-
 // SUPER ADMIN ROUTES (Auth + Super Admin Only)
 // ============================================
 Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
+
+Route::get('/tenants/{tenant}/edit', [SuperAdminTenantController::class, 'edit'])
+        ->name('tenants.edit');
+
+    Route::put('/tenants/{tenant}', [SuperAdminTenantController::class, 'update'])
+        ->name('tenants.update');
 
     Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])
         ->name('dashboard');

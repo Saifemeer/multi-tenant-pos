@@ -78,24 +78,28 @@
         </p>
     </div>
 
-    <!-- Inventory Value -->
-    <div class="stat-card animate-fade-in delay-4 group">
-        <div class="flex items-center justify-between mb-4">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 transition-transform duration-300">
-                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-            <div class="text-xs text-emerald-400 font-semibold">PKR</div>
+   <!-- Inventory Value -->
+<div class="stat-card animate-fade-in delay-4 group">
+    <div class="flex items-center justify-between mb-4">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
         </div>
-        <p class="text-2xl lg:text-3xl font-black text-emerald-400 tracking-tight">
-            {{ number_format($products->sum(fn($p) => $p->price * $p->stock_quantity)) }}
-        </p>
-        <p class="text-xs text-gray-500 mt-1.5 flex items-center gap-1">
-            <span class="w-1 h-1 rounded-full bg-emerald-400"></span>
-            Total inventory value
-        </p>
+        <div class="text-xs text-emerald-400 font-semibold bg-emerald-400/10 px-2 py-1 rounded-lg">
+            {{ $tenant->currency }}
+        </div>
     </div>
+
+    <p class="text-2xl lg:text-3xl font-black text-emerald-400 tracking-tight truncate">
+        {{ $tenant->formatMoney($products->sum(fn($p) => $p->price * $p->stock_quantity), 0) }}
+    </p>
+
+    <p class="text-xs text-gray-500 mt-1.5 flex items-center gap-1">
+        <span class="w-1 h-1 rounded-full bg-emerald-400"></span>
+        Total inventory value
+    </p>
+</div>
 </div>
 @if(isset($categories) && $categories->count() > 0)
 <div class="mb-8 animate-fade-in delay-3">
@@ -203,7 +207,7 @@
                         <div class="space-y-2">
                             <label class="flex items-center gap-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                                 <svg class="w-3.5 h-3.5 text-emerald-400/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                Price (PKR)
+                               Price ({{ $tenant->currency }})
                             </label>
                             <input type="number" name="price" step="0.01" required value="{{ old('price') }}"
                                    class="input-modern"
@@ -328,7 +332,7 @@
                                     <code class="text-[11px] text-gray-500 bg-white/[0.03] border border-white/[0.06] px-2.5 py-1 rounded-lg font-mono">{{ $product->sku ?? '—' }}</code>
                                 </td>
                                 <td class="px-4 py-4 text-right">
-                                    <span class="text-[13px] font-bold text-white">Rs. {{ number_format($product->price, 0) }}</span>
+                                    <span class="text-[13px] font-bold text-white">{{ $tenant->formatMoney($product->price, 0) }}</span>
                                     <p class="text-[10px] text-gray-600 mt-0.5">per unit</p>
                                 </td>
                                 <td class="px-4 py-4 text-center">

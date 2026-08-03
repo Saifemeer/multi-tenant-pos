@@ -8,11 +8,17 @@ use App\Models\Order;
 use App\Models\Customer;
 use App\Models\Expense;
 use App\Models\Category;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
+        // ✅ Cashier ko dashboard nahi, POS pe bhejo
+        if (Auth::user()->isCashier()) {
+            return redirect()->route('tenant.pos');
+        }
+
         // ✅ Today Stats
         $todaySales    = Order::today()->completed()->sum('total');
         $todayOrders   = Order::today()->completed()->count();
@@ -54,7 +60,8 @@ class DashboardController extends Controller
                                 ->sum('total'),
             ];
         }
-// ✅ Yeh line add karo — products pass karo view mein
+
+        // ✅ Products pass karo view mein
         $products = Product::latest()->get();
 
         $categories = Category::withCount('products')->where('is_active', true)->get();

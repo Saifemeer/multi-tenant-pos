@@ -36,7 +36,7 @@ class ProductController extends Controller
                 'Aapki "' . ucfirst($tenant->subscription_plan) . '" plan mein sirf ' . $tenant->productLimit() . ' products allowed hain. Zyada products add karne ke liye plan upgrade karein.'
             );
         }
-        
+
         $request->validate([
             'name'          => 'required|string|max:255',
             'category_id' => [
@@ -149,111 +149,171 @@ class ProductController extends Controller
     // ============================================
     // 6. POS SCREEN
     // ============================================
-    public function posScreen()
-{
-    $tenantId = auth()->user()->tenant_id;
+   public function posScreen()
+    {
+        $tenantId = auth()->user()->tenant_id;
 
-    $products = Product::with('category')
-                       ->where('tenant_id', $tenantId)  // ✅ ADD
-                       ->where('stock_quantity', '>', 0)
-                       ->where('is_active', true)
-                       ->get();
+        $products = Product::with('category')
+                           ->where('tenant_id', $tenantId)
+                           ->where('stock_quantity', '>', 0)
+                           ->where('is_active', true)
+                           ->get();
 
-    $categories = Category::where('tenant_id', $tenantId)  // ✅ ADD
-                          ->where('is_active', true)
-                          ->get();
+        $categories = Category::where('tenant_id', $tenantId)
+                              ->where('is_active', true)
+                              ->get();
 
-    return view('tenant.pos', compact('products', 'categories'));
-}
+        // ✅ Customers bhi bhejo — dropdown ke liye
+        $customers = \App\Models\Customer::where('tenant_id', $tenantId)
+                                          ->orderBy('name')
+                                          ->get();
+
+        return view('tenant.pos', compact('products', 'categories', 'customers'));
+    }
 
 public function checkout(Request $request)
-{
-    $request->validate([
-        'cart'           => 'required|json',
-        'payment_method' => 'required|in:cash,card,jazzcash,easypaisa,bank_transfer',
-        'discount'       => 'nullable|numeric|min:0',
-        'customer_id'    => 'nullable|exists:customers,id',
-        'notes'          => 'nullable|string',
-    ]);
+    {
+        $request->validate([
+            'cart'           => 'required|json',
+            'payment_method' => 'required|in:cash,card,jazzcash,easypaisa,bank_transfer,credit',
+            'discount'       => 'nullable|numeric|min:0',
+            'customer_id'    => 'nullable|exists:customers,id',
+            'redeem_points'  => 'nullable|integer|min:0',
+            'notes'          => 'nullable|string',
+        ]);
 
-    $cartItems = json_decode($request->cart, true);
+        $cartItems = json_decode($request->cart, true);
 
-    if (empty($cartItems)) {
-        return redirect()->back()->with('error', 'Cart khali hai!');
-    }
+        if (empty($cartItems)) {
+            return redirect()->back()->with('error', 'Cart khali hai!');
+        }
 
-    $tenantId = auth()->user()->tenant_id;  // ✅ ADD
+        $tenantId = auth()->user()->tenant_id;
 
-    try {
-        $order = \DB::transaction(function () use ($cartItems, $request, $tenantId) {
+        try {
+            $order = \DB::transaction(function () use ($cartItems, $request, $tenantId) {
 
-            $subtotal = 0;
-            $orderItemsData = [];
+                $subtotal = 0;
+                $orderItemsData = [];
 
-            foreach ($cartItems as $item) {
-                // ✅ tenant_id se product find karo
-                $product = Product::where('id', $item['id'])
-                                  ->where('tenant_id', $tenantId)
-                                  ->firstOrFail();
+                foreach ($cartItems as $item) {
+                    $product = Product::where('id', $item['id'])
+                                      ->where('tenant_id', $tenantId)
+                                      ->firstOrFail();
 
-                if ($product->stock_quantity < $item['quantity']) {
-                    throw new \Exception(
-                        '"' . $product->name . '" ka stock kam hai! ' .
-                        'Available: ' . $product->stock_quantity
-                    );
+                    if ($product->stock_quantity < $item['quantity']) {
+                        throw new \Exception(
+                            '"' . $product->name . '" ka stock kam hai! ' .
+                            'Available: ' . $product->stock_quantity
+                        );
+                    }
+
+                    $itemTotal = $product->price * $item['quantity'];
+                    $subtotal += $itemTotal;
+
+                    $orderItemsData[] = [
+                        'product_id'    => $product->id,
+                        'product_name'  => $product->name,
+                        'product_price' => $product->price,
+                        'quantity'      => $item['quantity'],
+                        'discount'      => 0,
+                        'total'         => $itemTotal,
+                    ];
+                }
+// ✅ Credit payment ke liye customer zaroori hai
+                if ($request->payment_method === 'credit' && !$request->customer_id) {
+                    throw new \Exception('Udhaar (credit) dene ke liye customer select karna zaroori hai.');
+                }
+                $manualDiscount = $request->discount ?? 0;
+
+                // ✅ Loyalty points redemption handle karo
+                $pointsDiscount = 0;
+                $pointsToRedeem = (int) ($request->redeem_points ?? 0);
+                $customer = null;
+
+                if ($request->customer_id) {
+                    $customer = \App\Models\Customer::where('id', $request->customer_id)
+                                                      ->where('tenant_id', $tenantId)
+                                                      ->lockForUpdate()
+                                                      ->firstOrFail();
+
+                    if ($pointsToRedeem > 0) {
+                        $minRedeem = config('loyalty.min_redeem');
+
+                        if ($pointsToRedeem < $minRedeem) {
+                            throw new \Exception("Kam se kam {$minRedeem} points chahiye redeem karne ke liye.");
+                        }
+
+                        if ($pointsToRedeem > $customer->loyalty_points) {
+                            throw new \Exception('Customer ke paas itne points nahi hain.');
+                        }
+
+                        $pointValue = config('loyalty.point_value');
+                        $pointsDiscount = $pointsToRedeem * $pointValue;
+
+                        // Discount order value se zyada nahi ho sakta
+                        if ($pointsDiscount > $subtotal) {
+                            $pointsDiscount = $subtotal;
+                        }
+                    }
                 }
 
-                $itemTotal = $product->price * $item['quantity'];
-                $subtotal += $itemTotal;
+                $discount = $manualDiscount + $pointsDiscount;
+                $tax      = 0;
+                $total    = max(0, $subtotal - $discount + $tax);
 
-                $orderItemsData[] = [
-                    'product_id'    => $product->id,
-                    'product_name'  => $product->name,
-                    'product_price' => $product->price,
-                    'quantity'      => $item['quantity'],
-                    'discount'      => 0,
-                    'total'         => $itemTotal,
-                ];
-            }
+               $order = \App\Models\Order::create([
+                    'tenant_id'        => $tenantId,
+                    'customer_id'      => $request->customer_id,
+                    'user_id'          => auth()->id(),
+                    'subtotal'         => $subtotal,
+                    'tax'              => $tax,
+                    'discount'         => $discount,
+                    'points_redeemed'  => $pointsToRedeem,
+                    'points_earned'    => $customer ? intdiv((int) $total, config('loyalty.points_per_currency')) : 0,
+                    'total'            => $total,
+                    'payment_method'   => $request->payment_method,
+                    'status'           => 'completed',
+                    'notes'            => $request->notes,
+                ]);
+                $order->items()->createMany($orderItemsData);
 
-            $discount = $request->discount ?? 0;
-            $tax      = 0;
-            $total    = $subtotal - $discount + $tax;
+                // ✅ Stock update
+                foreach ($cartItems as $item) {
+                    Product::where('id', $item['id'])
+                           ->where('tenant_id', $tenantId)
+                           ->decrement('stock_quantity', $item['quantity']);
+                }
 
-            $order = \App\Models\Order::create([
-                'tenant_id'      => $tenantId,  // ✅ ADD
-                'customer_id'    => $request->customer_id,
-                'user_id'        => auth()->id(),
-                'subtotal'       => $subtotal,
-                'tax'            => $tax,
-                'discount'       => $discount,
-                'total'          => $total,
-                'payment_method' => $request->payment_method,
-                'status'         => 'completed',
-                'notes'          => $request->notes,
-            ]);
+                // ✅ Customer ka record update karo (spend, visits, points, credit)
+                if ($customer) {
+                    $pointsEarned = intdiv((int) $total, config('loyalty.points_per_currency'));
 
-            $order->items()->createMany($orderItemsData);
+                    $updateData = [
+                        'total_spent'    => $customer->total_spent + $total,
+                        'visit_count'    => $customer->visit_count + 1,
+                        'loyalty_points' => $customer->loyalty_points - $pointsToRedeem + $pointsEarned,
+                    ];
 
-            // ✅ Stock update - tenant check ke saath
-            foreach ($cartItems as $item) {
-                Product::where('id', $item['id'])
-                       ->where('tenant_id', $tenantId)
-                       ->decrement('stock_quantity', $item['quantity']);
-            }
+                    // ✅ Agar credit (udhaar) pe liya hai, balance badhao
+                    if ($request->payment_method === 'credit') {
+                        $updateData['credit_balance'] = $customer->credit_balance + $total;
+                    }
 
-            return $order;
-        });
+                    $customer->update($updateData);
+                }
 
-        return redirect()->route('tenant.pos')
-            ->with('success', 'Bill successfully generate ho gaya! Order #' . $order->order_number);
+                return $order;
+            });
 
-    } catch (\Exception $e) {
-        return redirect()->back()
-            ->with('error', $e->getMessage());
+            return redirect()->route('tenant.pos')
+                ->with('success', 'Bill successfully generate ho gaya! Order #' . $order->order_number);
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', $e->getMessage());
+        }
     }
-}
-
     // ============================================
     // 8. STOCK ADJUST (Manual stock update)
     // ============================================

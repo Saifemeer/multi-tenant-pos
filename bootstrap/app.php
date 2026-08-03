@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'tenant.active' => \App\Http\Middleware\EnsureTenantIsActive::class,
              'super_admin'   => \App\Http\Middleware\EnsureUserIsSuperAdmin::class,
              'not.cashier'   => \App\Http\Middleware\EnsureNotCashier::class,
+             'tenant.admin'  => \App\Http\Middleware\EnsureIsAdmin::class,
         ]);
          $middleware->validateCsrfTokens(except: [
         'stripe/webhook',

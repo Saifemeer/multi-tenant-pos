@@ -35,10 +35,14 @@ class CustomerController extends Controller
 
         $totalCustomerSpending = Customer::sum('total_spent');
 
+        // ✅ Total outstanding credit (udhaar) sab customers ka
+        $totalCreditOutstanding = Customer::sum('credit_balance');
+
         return view('tenant.customers.index', compact(
             'customers',
             'totalCustomers',
-            'totalCustomerSpending'
+            'totalCustomerSpending',
+            'totalCreditOutstanding'
         ));
     }
 
@@ -83,6 +87,7 @@ class CustomerController extends Controller
             'email' => $validated['email'] ?? null,
             'address' => $validated['address'] ?? null,
             'total_spent' => 0,
+            'credit_balance' => 0,
             'visit_count' => 0,
             'loyalty_points' => 0,
         ]);
@@ -129,6 +134,37 @@ class CustomerController extends Controller
         $customer->update($validated);
 
         return back()->with('success', 'Customer updated successfully.');
+    }
+
+    /**
+     * ✅ Customer ka udhaar (credit) payment record karo.
+     */
+    public function recordPayment(Request $request, Customer $customer)
+    {
+        // Sirf apne tenant ka customer modify kar sakte ho
+        if ($customer->tenant_id !== auth()->user()->tenant_id) {
+            abort(403);
+        }
+
+        if ($customer->credit_balance <= 0) {
+            return back()->with('error', 'Is customer pe koi udhaar baaki nahi hai.');
+        }
+
+        $validated = $request->validate([
+            'amount' => [
+                'required',
+                'numeric',
+                'min:0.01',
+                'max:' . $customer->credit_balance,
+            ],
+        ]);
+
+        $customer->decrement('credit_balance', $validated['amount']);
+
+        return back()->with(
+            'success',
+            'Payment record ho gayi! Naya balance: Rs. ' . number_format($customer->fresh()->credit_balance, 2)
+        );
     }
 
     /**

@@ -25,6 +25,7 @@ class Order extends Model
         'payment_method',
         'status',
         'notes',
+        'refunded_by',
     ];
 
     protected $casts = [
@@ -99,5 +100,9 @@ class Order extends Model
     public function scopeCompleted(Builder $query): Builder
     {
         return $query->where('status', 'completed');
+    }
+    public function refundedBy()
+    {
+        return $this->belongsTo(User::class, 'refunded_by');
     }
 }

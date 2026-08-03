@@ -545,15 +545,17 @@
                 </div>
             </div>
             
-            <!-- Navigation -->
+           <!-- Navigation -->
             <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
                 
                 <div class="section-label mt-1 mb-3">Overview</div>
                 
+               @unless(auth()->user()->isCashier())
                 <a href="{{ route('tenant.dashboard') }}" class="nav-link {{ request()->routeIs('tenant.dashboard') ? 'active' : '' }}">
                     <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                     Dashboard
                 </a>
+                @endunless
                 
                 <a href="{{ route('tenant.pos') }}" class="nav-link {{ request()->routeIs('tenant.pos') ? 'active' : '' }}">
                     <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
@@ -583,8 +585,11 @@
                     <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                     Customers
                 </a>
-
-                @if(in_array(auth()->user()->role, ['admin', 'manager']))
+                <a href="{{ route('tenant.expenses.index') }}" class="nav-link {{ request()->routeIs('tenant.expenses.*') ? 'active' : '' }}">
+                    <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    Expenses
+                </a>
+                @if(auth()->user()->role === 'admin')
                 <a href="{{ route('tenant.staff.index') }}" class="nav-link {{ request()->routeIs('tenant.staff.*') ? 'active' : '' }}">
                     <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                     Staff
@@ -600,7 +605,14 @@
                     <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                     Reports
                 </a>
-
+                @endif
+@if(in_array(auth()->user()->role, ['admin', 'manager']))
+                <a href="{{ route('tenant.refund-logs.index') }}" class="nav-link {{ request()->routeIs('tenant.refund-logs.*') ? 'active' : '' }}">
+                    <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Refund Logs
+                </a>
+                @endif
+                @if(auth()->user()->role === 'admin')
                 <div class="section-label mt-6 mb-3">System</div>
                 
                 <a href="{{ route('tenant.settings.index') }}" class="nav-link {{ request()->routeIs('tenant.settings.*') ? 'active' : '' }}">
@@ -618,6 +630,7 @@
                         <span class="text-gray-500">Plan</span>
                         <span class="badge badge-success text-[10px] py-0.5 px-2 capitalize">{{ auth()->user()->tenant->subscription_plan }}</span>
                     </div>
+                    
                 </div>
                 
                 <div class="flex items-center gap-3 mb-3">

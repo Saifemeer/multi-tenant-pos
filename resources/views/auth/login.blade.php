@@ -426,9 +426,7 @@
                             </svg>
                             Password
                         </label>
-                        <a href="#" class="text-[11px] font-semibold transition-colors" style="color: var(--link-color);" onmouseover="this.style.color='var(--link-hover)'" onmouseout="this.style.color='var(--link-color)'">
-                            Forgot password?
-                        </a>
+                       
                     </div>
                     <div class="relative group">
                         <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none" style="color: var(--icon-color);">
@@ -450,7 +448,11 @@
                         </button>
                     </div>
                 </div>
-
+<div class="text-right mt-2">
+    <a href="{{ route('password.request') }}" class="text-sm text-indigo-400 hover:text-indigo-300">
+        Forgot password?
+    </a>
+</div>
                 <!-- Remember Me -->
                 <div class="flex items-center gap-3">
                     <input type="checkbox" name="remember" id="remember" class="custom-checkbox">

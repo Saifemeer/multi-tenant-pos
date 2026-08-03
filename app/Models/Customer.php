@@ -17,12 +17,14 @@ class Customer extends Model
         'email',
         'address',
         'total_spent',
+        'credit_balance',
         'visit_count',
         'loyalty_points',
     ];
 
     protected $casts = [
-        'total_spent' => 'decimal:2',
+        'total_spent'    => 'decimal:2',
+        'credit_balance' => 'decimal:2',
     ];
 
     public function tenant()

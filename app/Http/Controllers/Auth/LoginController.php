@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -23,15 +26,36 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
+        $throttleKey = Str::lower($credentials['email']) . '|' . $request->ip();
+
+        // ✅ Rate limit check — 5 attempts, phir lockout
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            $minutes = ceil($seconds / 60);
+
+            throw ValidationException::withMessages([
+                'email' => "Bahut zyada galat attempts ho gaye. Meherbani karke {$minutes} minute baad dubara try karein.",
+            ]);
+        }
+
         if (!Auth::attempt($credentials)) {
+            // ❌ Galat login — attempt count badhao
+            RateLimiter::hit($throttleKey, 300); // 5 minute ka lockout window
+
+            $remaining = 5 - RateLimiter::attempts($throttleKey);
+
             return back()->withErrors([
-                'email' => 'Email ya password galat hai.',
+                'email' => $remaining > 0
+                    ? "Email ya password galat hai. {$remaining} attempts baaki hain."
+                    : 'Bahut zyada galat attempts ho gaye. 5 minute baad try karein.',
             ])->onlyInput('email');
         }
 
+        // ✅ Login successful — rate limit clear karo
+        RateLimiter::clear($throttleKey);
+
         $user = Auth::user();
 
-        // ✅ User active hai ya nahi check karo (sab roles ke liye)
         if (!$user->is_active) {
             Auth::logout();
             return back()->withErrors([
@@ -39,7 +63,6 @@ class LoginController extends Controller
             ])->onlyInput('email');
         }
 
-        // ✅ Super admin ke liye tenant check skip karo
         if (!$user->isSuperAdmin()) {
             $tenant = $user->tenant;
             if (!$tenant || !$tenant->is_active) {
@@ -52,7 +75,6 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
-        // ✅ Super admin ko super-admin dashboard pe bhejo
         if ($user->isSuperAdmin()) {
             return redirect()->route('super-admin.dashboard')
                 ->with('success', 'Welcome back, ' . $user->name . '!');

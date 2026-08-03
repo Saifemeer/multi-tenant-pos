@@ -6,6 +6,24 @@
 
 @section('content')
 
+@php $tenant = auth()->user()->tenant; @endphp
+
+<!-- Stats -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 animate-fade-in">
+    <div class="stat-card">
+        <p class="text-xs font-semibold text-gray-500 uppercase">Total Customers</p>
+        <p class="text-2xl font-black text-white mt-2">{{ $totalCustomers }}</p>
+    </div>
+    <div class="stat-card">
+        <p class="text-xs font-semibold text-gray-500 uppercase">Total Spending</p>
+        <p class="text-2xl font-black text-emerald-400 mt-2">{{ $tenant->formatMoney($totalCustomerSpending, 0) }}</p>
+    </div>
+    <div class="stat-card">
+        <p class="text-xs font-semibold text-gray-500 uppercase">Credit Outstanding</p>
+        <p class="text-2xl font-black text-amber-400 mt-2">{{ $tenant->formatMoney($totalCreditOutstanding, 0) }}</p>
+    </div>
+</div>
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     
     <!-- Add Customer -->
@@ -60,6 +78,9 @@
                         <th class="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase hidden sm:table-cell">Phone</th>
                         <th class="text-right px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase">Total Spent</th>
                         <th class="text-center px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase hidden md:table-cell">Visits</th>
+                        <th class="text-center px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase hidden lg:table-cell">Points</th>
+                        <th class="text-right px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase hidden lg:table-cell">Credit Due</th>
+                        <th class="text-center px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase w-28">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-800/50">
@@ -80,15 +101,37 @@
                             <span class="text-sm text-gray-400">{{ $customer->phone ?? 'N/A' }}</span>
                         </td>
                         <td class="px-4 py-4 text-right">
-                            <span class="font-bold text-emerald-400 text-sm">Rs. {{ number_format($customer->total_spent, 2) }}</span>
+                            <span class="font-bold text-emerald-400 text-sm">{{ $tenant->formatMoney($customer->total_spent) }}</span>
                         </td>
                         <td class="px-4 py-4 text-center hidden md:table-cell">
                             <span class="text-sm text-gray-400">{{ $customer->visit_count }}</span>
                         </td>
+                        <td class="px-4 py-4 text-center hidden lg:table-cell">
+                            <span class="text-xs font-semibold px-2 py-1 rounded-lg bg-amber-500/10 text-amber-400">
+                                {{ $customer->loyalty_points }} pts
+                            </span>
+                        </td>
+                        <td class="px-4 py-4 text-right hidden lg:table-cell">
+                           @if($customer->credit_balance > 0)
+    <span class="font-bold text-amber-400 text-sm">{{ $tenant->formatMoney($customer->credit_balance) }}</span>
+@else
+                                <span class="text-xs text-gray-600">—</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-4 text-center">
+                            @if($customer->credit_balance > 0)
+                                <button onclick="openPaymentModal({{ $customer->id }}, '{{ addslashes($customer->name) }}', {{ $customer->credit_balance }})"
+                                        class="text-xs text-emerald-400 hover:underline font-semibold">
+                                    Record Payment
+                                </button>
+                            @else
+                                <span class="text-xs text-gray-700">—</span>
+                            @endif
+                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="py-16 text-center">
+                        <td colspan="7" class="py-16 text-center">
                             <p class="text-gray-400 font-semibold">No customers yet</p>
                             <p class="text-gray-600 text-sm mt-1">Add your first customer</p>
                         </td>
@@ -97,7 +140,54 @@
                 </tbody>
             </table>
         </div>
+
+        @if($customers->hasPages())
+        <div class="px-6 py-4 border-t border-gray-800">
+            {{ $customers->links() }}
+        </div>
+        @endif
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div id="paymentModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-sm">
+        <h3 class="text-base font-bold text-white mb-1">Record Payment</h3>
+        <p class="text-sm text-gray-500 mb-4">Customer: <span id="modalCustomerName" class="text-white font-medium"></span></p>
+
+        <form id="paymentForm" method="POST">
+            @csrf
+            <div class="mb-4">
+               <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+    Outstanding: {{ auth()->user()->tenant->currencySymbol() }} <span id="modalOutstanding"></span>
+</label>
+                <input type="number" name="amount" id="paymentAmountInput" step="0.01" min="0.01" required
+                       class="input-modern" placeholder="Amount received">
+            </div>
+            <div class="flex gap-2">
+                <button type="button" onclick="closePaymentModal()" class="btn-secondary flex-1">Cancel</button>
+                <button type="submit" class="btn-primary flex-1">Confirm Payment</button>
+            </div>
+        </form>
     </div>
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    function openPaymentModal(customerId, customerName, outstanding) {
+        document.getElementById('modalCustomerName').textContent = customerName;
+        document.getElementById('modalOutstanding').textContent = outstanding.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('paymentAmountInput').max = outstanding;
+        document.getElementById('paymentForm').action = `/tenant/customers/${customerId}/record-payment`;
+        document.getElementById('paymentModal').classList.remove('hidden');
+        document.getElementById('paymentModal').classList.add('flex');
+    }
+
+    function closePaymentModal() {
+        document.getElementById('paymentModal').classList.add('hidden');
+        document.getElementById('paymentModal').classList.remove('flex');
+    }
+</script>
+@endpush

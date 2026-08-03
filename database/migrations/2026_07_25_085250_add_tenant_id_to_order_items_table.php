@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -16,13 +17,16 @@ return new class extends Migration
                   ->cascadeOnDelete();
         });
 
-        // Purane records mein tenant_id fill karo (jo already table mein hain)
-        // ye orders table se tenant_id copy karega
-        DB::statement('
-            UPDATE order_items
-            INNER JOIN orders ON orders.id = order_items.order_id
-            SET order_items.tenant_id = orders.tenant_id
-        ');
+        // ✅ Purane records mein tenant_id fill karo — sirf MySQL pe (production)
+        // SQLite (jo tests use karti hain) ye syntax support nahi karta,
+        // aur test database hamesha khali shuru hoti hai isliye zaroorat bhi nahi
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement('
+                UPDATE order_items
+                INNER JOIN orders ON orders.id = order_items.order_id
+                SET order_items.tenant_id = orders.tenant_id
+            ');
+        }
     }
 
     public function down(): void

@@ -12,10 +12,10 @@ use Illuminate\Validation\Rule;
 class StaffController extends Controller
 {
     // ✅ Sirf admin/manager access kar sakte hain
-    protected function authorizeManager()
+   protected function authorizeManager()
     {
-        if (!in_array(Auth::user()->role, ['admin', 'manager'], true)) {
-            abort(403, 'Only admins and managers can manage staff.');
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Only the business admin can manage staff.');
         }
     }
 
