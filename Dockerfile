@@ -1,6 +1,4 @@
-﻿# Dockerfile configuration for Laravel POS
-
-FROM php:8.2-fpm
+﻿FROM php:8.2-fpm
 
 # System dependencies
 RUN apt-get update && apt-get install -y \
@@ -24,4 +22,5 @@ RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 EXPOSE 80
 
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=80
+# Updated CMD line to ensure port 80 always starts
+CMD php artisan serve --host=0.0.0.0 --port=80
