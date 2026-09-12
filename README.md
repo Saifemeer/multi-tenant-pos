@@ -1,56 +1,49 @@
-# Flash POS — Multi-Tenant Point of Sale SaaS
+# SaaS POS — Multi-Tenant Point of Sale Platform
 
-A full-stack, multi-tenant Point of Sale (POS) platform built with Laravel. Businesses can register, choose a subscription plan, and manage their own isolated store — including inventory, sales, staff, and customers — all from a single codebase serving multiple tenants.
+A full-stack, multi-tenant Point of Sale (POS) SaaS built with **Laravel** and **Filament-style Blade UI**, designed for small retail businesses (boutiques, cafés, pharmacies, grocery stores, salons, and more). Each business signs up as an isolated **tenant** with its own staff, inventory, customers, and billing — all running on a single codebase.
 
-
-
-## 🔗 Links
-- GitHub: [github.com/Saifemeer/multi-tenant-pos](https://github.com/Saifemeer/multi-tenant-pos)
-- LinkedIn: [linkedin.com/in/muhammad-saifullah11](https://www.linkedin.com/in/muhammad-saifullah11/)
+> 🎓 This is a personal portfolio project built to demonstrate full-stack Laravel development, multi-tenant architecture, and SaaS billing integration. Roman Urdu is used throughout the interface to make it accessible to Pakistani small-business owners and staff who are more comfortable with it than English.
 
 ---
 
-## ✨ Key Features
-
-### Multi-Tenancy
-- Single-database, shared-schema architecture using `tenant_id` scoping
-- Global Eloquent scopes (`BelongsToTenant` trait) automatically isolate every tenant's data — no query can accidentally leak data across businesses
-- Tenant-scoped order numbering, product catalogs, and reporting
-
-### Subscription Billing (Stripe)
-- Three-tier pricing (Starter / Business / Enterprise) with Stripe Checkout
-- 14-day free trial on paid plans
-- Stripe Webhooks handle payment success, failure, and cancellation events — the app doesn't rely solely on redirect URLs, since payment confirmation comes directly from Stripe
-- Plan-based feature gating: product limits, staff limits, and analytics access are enforced server-side based on the tenant's active plan
-
-### Role-Based Access Control
-- Three roles per tenant: **Admin**, **Manager**, **Cashier**
-- Cashiers are restricted to the POS checkout screen only — no access to inventory, reports, or settings
-- Route-level middleware (`not.cashier`) and controller-level checks enforce permissions on both the backend and the UI
+## ✨ Features
 
 ### Point of Sale
-- Fast product search and cart-based checkout
-- Real-time stock validation and deduction on sale
-- Multiple payment methods (Cash, Card, JazzCash, Easypaisa, Bank Transfer)
-- Automatic tenant-scoped, race-condition-safe order number generation
+- Fast, keyboard-shortcut-friendly checkout screen (search by name, SKU, or barcode)
+- Cart with live stock validation, loyalty-point redemption, and multiple payment methods (Cash, Card, JazzCash, Credit/Udhaar)
+- Auto-generated, printable/downloadable PDF receipts
 
-### Inventory & Business Management
-- Product catalog with categories, SKU/barcode, low-stock alerts, and profit margin calculations
-- Customer database with visit and spend tracking
-- Sales reports with revenue breakdowns (daily/weekly/monthly) and top-selling products, visualized with Chart.js
+### Inventory & Catalog
+- Product catalog with categories, SKU/barcode, stock levels, and low-stock alerts
+- CSV export of visible inventory
+- Plan-based product limits (Starter / Business / Enterprise)
 
-### Staff Management
-- Admins/Managers can invite staff (Manager or Cashier roles)
-- Staff limits enforced per subscription plan
+### Sales & Customers
+- Order history with role-gated refunds (only Admin/Manager can issue a refund — cashiers cannot self-refund)
+- Full refund audit log with a "mark reviewed" workflow
+- Customer directory with loyalty points, visit count, and credit (Udhaar) balance tracking
 
-### Super Admin Panel
-- Platform-wide dashboard separate from tenant dashboards
-- View all tenants, activate/deactivate accounts, monitor trial expirations and platform revenue
+### Multi-Tenancy & Staff
+- Strict tenant data isolation via a `BelongsToTenant` global scope trait applied across all tenant-owned models
+- Role-based access control: **Admin**, **Manager**, **Cashier** — each with a different slice of the UI and routes
+- Staff management with activate/deactivate and safe self-protection (you can't deactivate yourself or another admin)
 
-### Security
-- Mid-session account/tenant deactivation checks (a deactivated user or tenant is signed out immediately, not just blocked at login)
-- CSRF protection with a scoped exception for the Stripe webhook endpoint
-- Registration wrapped in a DB transaction — if Stripe setup fails, no orphaned tenant/user records are left behind
+### Billing & Subscriptions
+- Stripe Checkout integration for paid plans (Business / Enterprise), with a 14-day trial
+- Signature-verified Stripe webhook handling for subscription lifecycle events (created, updated, cancelled, payment failed)
+- Super Admin panel to manage all tenants: view billing status, plan, usage stats, and manually activate/deactivate/edit/delete a tenant
+
+### Reports
+- Revenue trend chart (last 7 days), best-selling products, and daily/weekly/monthly revenue breakdowns
+
+---
+
+## 🏗️ Architecture Notes
+
+- **Tenant isolation** — every tenant-scoped model (`Product`, `Order`, `Customer`, `Category`, `Expense`, …) uses a shared `BelongsToTenant` trait that applies a global query scope and auto-fills `tenant_id` on create. This means a stray query anywhere in the app can't accidentally leak another business's data.
+- **Route-level role gating** — `routes/web.php` groups routes under `not.cashier` (Admin + Manager) and `tenant.admin` (Admin only) middleware, so authorization is enforced before a request even reaches a controller, not just hidden in the UI.
+- **Checkout consistency** — the POS checkout (`ProductController@checkout`) runs inside a single DB transaction with `lockForUpdate()` on the customer row, so concurrent sales can't corrupt stock counts or loyalty-point balances.
+- **Signed webhooks** — `StripeWebhookController` verifies the Stripe signature header before processing any event, and fails closed on an invalid payload.
 
 ---
 
@@ -58,41 +51,44 @@ A full-stack, multi-tenant Point of Sale (POS) platform built with Laravel. Busi
 
 | Layer | Technology |
 |---|---|
-| Backend | Laravel 12 (PHP 8.2) |
-| Database | MySQL |
-| Frontend | Blade, Tailwind CSS |
-| Payments | Stripe (Checkout, Subscriptions, Webhooks) |
+| Backend | Laravel (PHP) |
+| Frontend | Blade, Tailwind CSS, vanilla JS, GSAP (landing page animations) |
+| Database | MySQL / SQLite |
+| Payments | Stripe (Checkout + Webhooks) |
 | Charts | Chart.js |
-| Auth | Laravel's built-in authentication |
 
 ---
 
-## 🏗️ Architecture Highlights
+## 🚀 Getting Started
 
-**Tenant Isolation** — Every tenant-owned model uses a shared `BelongsToTenant` trait that applies a global Eloquent scope, automatically filtering all queries by the authenticated user's `tenant_id`, and auto-fills `tenant_id` on creation.
+### Requirements
+- PHP 8.2+
+- Composer
+- MySQL or SQLite
+- A Stripe account (test mode) if you want to exercise the billing flow
 
-**Plan-Based Gating** — Subscription limits (`config/plans.php`) are checked at the model level (`Tenant::hasReachedProductLimit()`, `hasReachedUserLimit()`, `canAccessReports()`) rather than hardcoded in controllers, making it easy to add or adjust plans.
-
-**Webhook-Driven Billing State** — Rather than trusting the browser redirect after checkout, subscription status (`trialing`, `active`, `past_due`, `canceled`) is updated via Stripe webhook events, matching how production billing systems behave.
-
----
-
-## ⚙️ Local Setup
+### Setup
 
 ```bash
-git clone https://github.com/Saifemeer/multi-tenant-pos.git
-cd multi-tenant-pos
+git clone <your-repo-url>
+cd saas-pos
 
 composer install
-npm install
 
 cp .env.example .env
 php artisan key:generate
+
+# Configure your database in .env, then:
+php artisan migrate --seed
+
+php artisan serve
 ```
 
-Configure your `.env`:
-```
-DB_DATABASE=multi_tenant_pos
+### Environment variables to set
+
+```env
+DB_CONNECTION=mysql
+DB_DATABASE=saas_pos
 DB_USERNAME=root
 DB_PASSWORD=
 
@@ -103,27 +99,52 @@ STRIPE_PRICE_BUSINESS=price_...
 STRIPE_PRICE_ENTERPRISE=price_...
 ```
 
-```bash
-php artisan migrate
-php artisan serve
-npm run dev
-```
+### Default accounts (after `--seed`)
+- **Super Admin** — see `database/seeders/SuperAdminSeeder.php` for credentials
+- New businesses can self-register at `/register-business`
 
-For local Stripe webhook testing:
-```bash
-stripe listen --forward-to localhost:8000/stripe/webhook
+---
+
+## 📁 Project Structure (high level)
+
+```
+app/
+├── Http/Controllers/
+│   ├── Auth/              # Login, registration, password reset
+│   ├── Tenant/            # POS, products, orders, customers, staff, settings...
+│   ├── SuperAdmin/        # Platform-level tenant management
+│   └── StripeWebhookController.php
+├── Models/
+│   ├── Concerns/BelongsToTenant.php   # Shared multi-tenancy scope
+│   └── ...
+resources/views/
+├── tenant/                # Business-facing app (POS, dashboard, etc.)
+├── super-admin/           # Platform owner's admin panel
+├── auth/
+└── welcome.blade.php      # Public marketing landing page
 ```
 
 ---
 
-## 📌 Roadmap
-- [ ] Automated test coverage (PHPUnit/Pest)
-- [ ] Email notifications (staff invites, receipts)
-- [ ] Multi-store support for Enterprise tenants
-- [ ] Production deployment
+## 🗺️ Roadmap / Known Limitations
+
+This project is under active iteration. Some things intentionally left for a future pass before any real production deployment:
+
+- [ ] Automated test coverage (checkout, tenant isolation, refund authorization)
+- [ ] Email verification enforcement
+- [ ] Local payment gateway support (JazzCash/Easypaisa direct integration, since Stripe doesn't support direct payouts to Pakistan)
+- [ ] Rate limiting on the checkout endpoint
+- [ ] Production hardening: error monitoring, automated backups, staging environment
+
+---
+
+## 📄 License
+
+This is a personal portfolio project. Feel free to explore the code for learning purposes.
 
 ---
 
 ## 👤 Author
-**Muhammad Saifullah** — Full Stack Developer (Laravel/PHP)
-[LinkedIn](https://www.linkedin.com/in/muhammad-saifullah11/) · [GitHub](https://github.com/Saifemeer/)
+
+**Muhammad Saifullah**
+Full Stack Developer (PHP / Laravel) — Karachi, Pakistan
