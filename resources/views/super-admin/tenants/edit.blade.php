@@ -1,7 +1,7 @@
 @extends('layouts.super-admin')
 
 @section('page-title', 'Edit Tenant')
-@section('page-subtitle', 'Update ' . $tenant->company_name . '\'s details')
+@section('page-subtitle', $tenant->company_name . ' ki detail update karein')
 
 @section('content')
 <div class="w-full max-w-3xl">
@@ -11,14 +11,14 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
             </svg>
-            Back to Tenant
+            Tenant Par Wapas Jayein
         </a>
     </div>
 
     <div class="rounded-2xl overflow-hidden animate-fade-in delay-1" style="background: var(--bg-card); border: 1px solid var(--border);">
         <div class="px-6 py-4" style="border-bottom: 1px solid var(--border);">
-            <h3 class="text-sm font-bold" style="color: var(--text-heading);">Edit Tenant Details</h3>
-            <p class="text-[11px] mt-0.5" style="color: var(--text-muted);">Update business information and subscription plan</p>
+            <h3 class="text-sm font-bold" style="color: var(--text-heading);">Tenant Ki Detail Edit Karein</h3>
+            <p class="text-[11px] mt-0.5" style="color: var(--text-muted);">Business ki maloomat aur subscription plan update karein</p>
         </div>
 
         <div class="p-6">
@@ -38,7 +38,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color: var(--text-muted);">Company Name</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color: var(--text-muted);">Company Ka Naam</label>
                         <input type="text" name="company_name" required value="{{ old('company_name', $tenant->company_name) }}" class="input-modern">
                     </div>
 
@@ -53,7 +53,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color: var(--text-muted);">Business Category</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color: var(--text-muted);">Business Ki Category</label>
                         <input type="text" name="business_category" value="{{ old('business_category', $tenant->business_category) }}" class="input-modern">
                     </div>
 
@@ -73,18 +73,18 @@
                             <option value="business" {{ old('subscription_plan', $tenant->subscription_plan) === 'business' ? 'selected' : '' }}>Business</option>
                             <option value="enterprise" {{ old('subscription_plan', $tenant->subscription_plan) === 'enterprise' ? 'selected' : '' }}>Enterprise</option>
                         </select>
-                        <p class="text-[10.5px] mt-1.5" style="color: var(--text-muted);">⚠️ Manually changing the plan does not update Stripe billing.</p>
+                        <p class="text-[10.5px] mt-1.5" style="color: var(--text-muted);">⚠️ Plan khud change karne se Stripe billing update nahi hoti.</p>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color: var(--text-muted);">Address</label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color: var(--text-muted);">Pata</label>
                     <textarea name="address" rows="2" class="input-modern">{{ old('address', $tenant->address) }}</textarea>
                 </div>
 
                 <div class="flex gap-3 pt-2">
                     <a href="{{ route('super-admin.tenants.show', $tenant) }}" class="btn-secondary flex-1 justify-center">Cancel</a>
-                    <button type="submit" class="btn-primary flex-1 justify-center">Save Changes</button>
+                    <button type="submit" class="btn-primary flex-1 justify-center">Changes Save Karein</button>
                 </div>
             </form>
         </div>

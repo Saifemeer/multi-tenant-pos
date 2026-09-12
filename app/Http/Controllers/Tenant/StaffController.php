@@ -40,12 +40,12 @@ class StaffController extends Controller
 
         // ✅ Plan-based staff limit check (Starter plan = koi staff nahi)
         if ($tenant->hasReachedUserLimit()) {
-            $message = $tenant->userLimit() === 1
-                ? 'Aapki "Starter" plan mein staff add karne ki suhulat nahi hai. Business ya Enterprise plan mein upgrade karein.'
-                : 'Aapki plan mein staff limit ' . $tenant->userLimit() . ' hai, jo pahunch chuki hai.';
+    $message = $tenant->userLimit() === 1
+        ? 'Your "Starter" plan does not support adding staff. Please upgrade to the Business or Enterprise plan.'
+        : 'Your plan has a staff limit of ' . $tenant->userLimit() . ', which has been reached.';
 
-            return back()->with('error', $message);
-        }
+    return back()->with('error', $message);
+}
 
         $request->validate([
             'name'     => 'required|string|max:255',
@@ -63,7 +63,7 @@ class StaffController extends Controller
             'is_active' => true,
         ]);
 
-        return back()->with('success', 'Staff member successfully add ho gaya!');
+        return back()->with('success', 'Staff member added successfully!');
     }
 
     public function toggleStatus(User $user)
@@ -77,13 +77,13 @@ class StaffController extends Controller
 
         // ✅ Khud ko ya kisi admin ko deactivate na kar sako
         if ($user->id === Auth::id() || $user->role === 'admin') {
-            return back()->with('error', 'Ye action allowed nahi hai.');
+            return back()->with('error', 'This action is not allowed.');
         }
 
         $user->update(['is_active' => !$user->is_active]);
 
         $status = $user->is_active ? 'activated' : 'deactivated';
-        return back()->with('success', "Staff member {$status} ho gaya.");
+        return back()->with('success', "Staff member {$status} done.");
     }
 
     public function destroy(User $user)
@@ -95,11 +95,11 @@ class StaffController extends Controller
         }
 
         if ($user->id === Auth::id() || $user->role === 'admin') {
-            return back()->with('error', 'Ye action allowed nahi hai.');
+            return back()->with('error', 'This action is not allowed.');
         }
 
         $user->delete();
 
-        return back()->with('success', 'Staff member remove kar diya gaya.');
+        return back()->with('success', 'Staff member removed successfully.');
     }
 }

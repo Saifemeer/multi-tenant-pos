@@ -141,8 +141,8 @@ class OrderController extends Controller
         }
 
         if ($order->status !== 'completed') {
-            return back()->with('error', 'Sirf completed orders refund kiye ja sakte hain.');
-        }
+    return back()->with('error', 'Only completed orders can be refunded.');
+}
 
         $request->validate([
             'reason' => 'required|string|max:500',
@@ -192,7 +192,8 @@ class OrderController extends Controller
             ]);
         });
 
-        return back()->with('success', 'Order #' . $order->order_number . ' refund ho gaya. Stock wapas add ho gaya.');
+      return back()->with('success', 'Order #' . $order->order_number . ' has been refunded. Stock has been restored.');
+
     }
 
     /**
@@ -234,6 +235,6 @@ class OrderController extends Controller
             'reviewed_at' => now(),
         ]);
 
-        return back()->with('success', 'Refund review ho gaya.');
+        return back()->with('success', 'Refund reviewed successfully.');
     }
 }

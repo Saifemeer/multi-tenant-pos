@@ -1,7 +1,7 @@
 @extends('layouts.super-admin')
 
 @section('page-title', 'Dashboard')
-@section('page-subtitle', 'Platform overview & analytics')
+@section('page-subtitle', 'Platform ka jaiza aur analytics')
 
 @section('content')
 <div class="w-full">
@@ -16,14 +16,14 @@
             </div>
             <div>
                 <h1 class="text-2xl font-black tracking-tight" style="color: var(--text-heading);">Super Admin Dashboard</h1>
-                <p class="text-sm mt-0.5" style="color: var(--text-muted);">Welcome back! Here's your platform overview.</p>
+                <p class="text-sm mt-0.5" style="color: var(--text-muted);">Wapas khush aamdeed! Ye raha aapke platform ka jaiza.</p>
             </div>
         </div>
         <a href="{{ route('super-admin.tenants.index') }}" class="btn-primary">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2M5 21H3"/>
             </svg>
-            Manage Tenants
+            Tenants Manage Karein
         </a>
     </div>
 
@@ -142,7 +142,7 @@
     <!-- Billing Health -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-fade-in delay-1">
         <div class="stat-card">
-            <p class="text-xs" style="color: var(--text-muted);">Trialing</p>
+            <p class="text-xs" style="color: var(--text-muted);">Trial Mein</p>
             <p class="text-2xl font-bold mt-1" style="color: #60a5fa;">{{ $billingStats['trialing'] }}</p>
         </div>
         <div class="stat-card">
@@ -150,18 +150,18 @@
             <p class="text-2xl font-bold mt-1" style="color: var(--success);">{{ $billingStats['active'] }}</p>
         </div>
         <div class="stat-card">
-            <p class="text-xs" style="color: var(--text-muted);">Past Due</p>
+            <p class="text-xs" style="color: var(--text-muted);">Payment Baqi</p>
             <p class="text-2xl font-bold mt-1" style="color: var(--danger);">{{ $billingStats['past_due'] }}</p>
         </div>
         <div class="stat-card">
-            <p class="text-xs" style="color: var(--text-muted);">Canceled</p>
+            <p class="text-xs" style="color: var(--text-muted);">Cancel Ho Gaya</p>
             <p class="text-2xl font-bold mt-1" style="color: var(--text-muted);">{{ $billingStats['canceled'] }}</p>
         </div>
     </div>
 
     <!-- Plan Distribution -->
     <div class="rounded-2xl p-5 mb-8 animate-fade-in delay-2" style="background: var(--bg-card); border: 1px solid var(--border);">
-        <h2 class="text-sm font-semibold mb-4" style="color: var(--text-heading);">Plan Distribution</h2>
+        <h2 class="text-sm font-semibold mb-4" style="color: var(--text-heading);">Plan Ki Taqseem</h2>
         <div class="grid grid-cols-3 gap-4">
             <div class="text-center">
                 <p class="text-2xl font-bold" style="color: var(--text-secondary);">{{ $planStats['starter'] }}</p>
@@ -182,12 +182,12 @@
     @if($pastDueTenants->count())
     <div class="rounded-2xl overflow-hidden mb-8 animate-fade-in delay-2" style="background: var(--danger-bg); border: 1px solid rgba(239,68,68,0.2);">
         <div class="px-6 py-4">
-            <h2 class="text-sm font-semibold mb-3" style="color: var(--danger);">🚨 Payment Failed — Needs Attention</h2>
+            <h2 class="text-sm font-semibold mb-3" style="color: var(--danger);">🚨 Payment Fail Ho Gaya — Tawajju Chahiye</h2>
             <ul class="space-y-2">
                 @foreach($pastDueTenants as $t)
                     <li class="flex items-center justify-between text-sm">
                         <span style="color: var(--text-secondary);">{{ $t->company_name }} — {{ ucfirst($t->subscription_plan ?? 'N/A') }} plan</span>
-                        <a href="{{ route('super-admin.tenants.show', $t) }}" class="font-medium" style="color: var(--danger);">View →</a>
+                        <a href="{{ route('super-admin.tenants.show', $t) }}" class="font-medium" style="color: var(--danger);">Dekhein →</a>
                     </li>
                 @endforeach
             </ul>
@@ -206,8 +206,8 @@
                     </svg>
                 </div>
                 <div class="flex-1">
-                    <h3 class="text-sm font-bold" style="color: var(--text-heading);">Trials Expiring Soon</h3>
-                    <p class="text-[11px]" style="color: var(--text-muted);">{{ $expiringTrials->count() }} tenant(s) trial expires within 3 days</p>
+                    <h3 class="text-sm font-bold" style="color: var(--text-heading);">Trials Jald Khatam Ho Rahe Hain</h3>
+                    <p class="text-[11px]" style="color: var(--text-muted);">{{ $expiringTrials->count() }} tenant ka trial 3 din mein khatam ho raha hai</p>
                 </div>
                 <span class="relative flex h-3 w-3">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -225,7 +225,7 @@
                         </div>
                         <div>
                             <p class="text-sm font-semibold" style="color: var(--text-heading);">{{ $t->company_name }}</p>
-                            <p class="text-[11px]" style="color: var(--text-muted);">Trial expires {{ $t->trial_ends_at->diffForHumans() }}</p>
+                            <p class="text-[11px]" style="color: var(--text-muted);">Trial khatam hoga: {{ $t->trial_ends_at->diffForHumans() }}</p>
                         </div>
                     </div>
                     <span class="badge text-[10px] py-0.5 px-2.5" style="background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2);">
@@ -251,8 +251,8 @@
                             <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                         </div>
                         <div>
-                            <h3 class="text-sm font-bold" style="color: var(--text-heading);">Quick Actions</h3>
-                            <p class="text-[11px]" style="color: var(--text-muted);">Common tasks</p>
+                            <h3 class="text-sm font-bold" style="color: var(--text-heading);">Foran Ke Kaam</h3>
+                            <p class="text-[11px]" style="color: var(--text-muted);">Aam kaam</p>
                         </div>
                     </div>
                 </div>
@@ -262,8 +262,8 @@
                             <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/></svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-[13px] font-semibold" style="color: var(--text-heading);">View All Tenants</p>
-                            <p class="text-[11px]" style="color: var(--text-muted);">Manage accounts</p>
+                            <p class="text-[13px] font-semibold" style="color: var(--text-heading);">Sare Tenants Dekhein</p>
+                            <p class="text-[11px]" style="color: var(--text-muted);">Accounts Manage Karein</p>
                         </div>
                         <svg class="w-4 h-4 flex-shrink-0 group-hover:translate-x-1 transition-transform" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </a>
@@ -273,8 +273,8 @@
                             <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-[13px] font-semibold" style="color: var(--text-heading);">Past Due Tenants</p>
-                            <p class="text-[11px]" style="color: var(--text-muted);">Payment issues</p>
+                            <p class="text-[13px] font-semibold" style="color: var(--text-heading);">Payment Baqi Wale Tenants</p>
+                            <p class="text-[11px]" style="color: var(--text-muted);">Payment ke masail</p>
                         </div>
                         <svg class="w-4 h-4 flex-shrink-0 group-hover:translate-x-1 transition-transform" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </a>
@@ -291,12 +291,12 @@
                             <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
                         <div>
-                            <h3 class="text-sm font-bold" style="color: var(--text-heading);">Recently Registered</h3>
-                            <p class="text-[11px]" style="color: var(--text-muted);">Latest tenant signups</p>
+                            <h3 class="text-sm font-bold" style="color: var(--text-heading);">Abhi Register Hue</h3>
+                            <p class="text-[11px]" style="color: var(--text-muted);">Naye tenant signups</p>
                         </div>
                     </div>
                     <a href="{{ route('super-admin.tenants.index') }}" class="text-xs font-semibold transition-colors flex items-center gap-1" style="color: var(--accent-light);">
-                        View All
+                        Sab Dekhein
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </a>
                 </div>
@@ -307,7 +307,7 @@
                             <tr style="border-bottom: 1px solid var(--border);">
                                 <th class="text-left px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider" style="color: var(--text-muted);">Company</th>
                                 <th class="text-left px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider hidden sm:table-cell" style="color: var(--text-muted);">Category</th>
-                                <th class="text-left px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider hidden md:table-cell" style="color: var(--text-muted);">Joined</th>
+                                <th class="text-left px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider hidden md:table-cell" style="color: var(--text-muted);">Shamil Hua</th>
                                 <th class="text-center px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider" style="color: var(--text-muted);">Status</th>
                             </tr>
                         </thead>
@@ -358,8 +358,8 @@
                                             </svg>
                                         </div>
                                         <div>
-                                            <p class="text-sm font-bold" style="color: var(--text-heading);">No tenants yet</p>
-                                            <p class="text-xs mt-1" style="color: var(--text-muted);">New signups will appear here</p>
+                                            <p class="text-sm font-bold" style="color: var(--text-heading);">Abhi tak koi tenant nahi</p>
+                                            <p class="text-xs mt-1" style="color: var(--text-muted);">Nayi signups yahan nazar aayengi</p>
                                         </div>
                                     </div>
                                 </td>

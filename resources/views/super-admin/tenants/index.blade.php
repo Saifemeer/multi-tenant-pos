@@ -1,7 +1,7 @@
 @extends('layouts.super-admin')
 
 @section('page-title', 'Tenants Management')
-@section('page-subtitle', 'Manage all registered businesses')
+@section('page-subtitle', 'Sare registered businesses manage karein')
 
 @section('content')
 <div class="w-full">
@@ -9,15 +9,15 @@
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 animate-fade-in">
         <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/10 flex items-center justify-center border border-indigo-500/20">
-                <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-till-500/20 to-purple-500/10 flex items-center justify-center border border-till-500/20">
+                <svg class="w-6 h-6 text-till-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2M5 21H3m16 0h-2M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4a1 1 0 011-1h0a1 1 0 011 1v4"/>
                 </svg>
             </div>
             <div>
-                <h1 class="text-2xl font-black tracking-tight" style="color: var(--text-heading);">All Tenants</h1>
+                <h1 class="text-2xl font-black tracking-tight" style="color: var(--text-heading);">Sare Tenants</h1>
                 <p class="text-sm mt-0.5" style="color: var(--text-muted);">
-                    {{ $tenants->total() }} total businesses registered
+                    {{ $tenants->total() }} businesses register hain
                 </p>
             </div>
         </div>
@@ -25,7 +25,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
             </svg>
-            Back to Dashboard
+            Dashboard Par Wapas Jayein
         </a>
     </div>
 
@@ -40,7 +40,7 @@
                     </svg>
                 </div>
                 <input type="text" name="search" value="{{ request('search') }}"
-                       placeholder="Search by company name..."
+                       placeholder="Company ke naam se search karein..."
                        class="input-modern pl-11 py-3 text-[13px]"
                        style="padding-left: 44px;">
             </div>
@@ -48,8 +48,8 @@
             <!-- Status Filter -->
             <div class="relative sm:w-40">
                 <select name="status" class="input-modern py-3 text-[13px] appearance-none pr-10 cursor-pointer"
-                        style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236366f1' d='M6 9L1 4h10z'/%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 16px center;">
-                    <option value="">All Status</option>
+                        style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230E7A5C' d='M6 9L1 4h10z'/%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 16px center;">
+                    <option value="">Sara Status</option>
                     <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
                     <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
                 </select>
@@ -58,20 +58,20 @@
             <!-- Billing Status Filter -->
             <div class="relative sm:w-44">
                 <select name="billing_status" class="input-modern py-3 text-[13px] appearance-none pr-10 cursor-pointer"
-                        style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236366f1' d='M6 9L1 4h10z'/%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 16px center;">
-                    <option value="">All Billing Status</option>
-                    <option value="trialing" {{ request('billing_status') === 'trialing' ? 'selected' : '' }}>Trialing</option>
+                        style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230E7A5C' d='M6 9L1 4h10z'/%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 16px center;">
+                    <option value="">Sara Billing Status</option>
+                    <option value="trialing" {{ request('billing_status') === 'trialing' ? 'selected' : '' }}>Trial Mein</option>
                     <option value="active" {{ request('billing_status') === 'active' ? 'selected' : '' }}>Active</option>
-                    <option value="past_due" {{ request('billing_status') === 'past_due' ? 'selected' : '' }}>Past Due</option>
-                    <option value="canceled" {{ request('billing_status') === 'canceled' ? 'selected' : '' }}>Canceled</option>
+                    <option value="past_due" {{ request('billing_status') === 'past_due' ? 'selected' : '' }}>Payment Baqi</option>
+                    <option value="canceled" {{ request('billing_status') === 'canceled' ? 'selected' : '' }}>Cancel</option>
                 </select>
             </div>
 
             <!-- Plan Filter -->
             <div class="relative sm:w-40">
                 <select name="plan" class="input-modern py-3 text-[13px] appearance-none pr-10 cursor-pointer"
-                        style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236366f1' d='M6 9L1 4h10z'/%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 16px center;">
-                    <option value="">All Plans</option>
+                        style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230E7A5C' d='M6 9L1 4h10z'/%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 16px center;">
+                    <option value="">Sare Plans</option>
                     <option value="starter" {{ request('plan') === 'starter' ? 'selected' : '' }}>Starter</option>
                     <option value="business" {{ request('plan') === 'business' ? 'selected' : '' }}>Business</option>
                     <option value="enterprise" {{ request('plan') === 'enterprise' ? 'selected' : '' }}>Enterprise</option>
@@ -83,7 +83,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                 </svg>
-                Filter
+                Filter Karein
             </button>
 
             <!-- Reset -->
@@ -92,7 +92,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
-                Clear
+                Saaf Karein
             </a>
             @endif
         </form>
@@ -111,14 +111,13 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold" style="color: var(--text-heading);">Tenant Directory</h3>
+                        <h3 class="text-sm font-bold" style="color: var(--text-heading);">Tenants Ki List</h3>
                         <p class="text-[11px]" style="color: var(--text-muted);">
-                            Showing {{ $tenants->firstItem() ?? 0 }}–{{ $tenants->lastItem() ?? 0 }} of {{ $tenants->total() }}
+                            {{ $tenants->firstItem() ?? 0 }}–{{ $tenants->lastItem() ?? 0 }} / {{ $tenants->total() }} dikha rahe hain
                         </p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <!-- ✅ Fix: ab poore database ka sahi count hai, sirf current page ka nahi -->
                     <span class="badge badge-success text-[10px]">{{ $activeCount }} Active</span>
                     <span class="badge badge-danger text-[10px]">{{ $inactiveCount }} Inactive</span>
                 </div>
@@ -135,7 +134,7 @@
                             <th class="text-left px-4 py-4 text-[11px] font-bold uppercase tracking-wider hidden lg:table-cell" style="color: var(--text-muted);">Plan</th>
                             <th class="text-left px-4 py-4 text-[11px] font-bold uppercase tracking-wider hidden lg:table-cell" style="color: var(--text-muted);">Billing</th>
                             <th class="text-center px-4 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: var(--text-muted);">Status</th>
-                            <th class="text-left px-4 py-4 text-[11px] font-bold uppercase tracking-wider hidden lg:table-cell" style="color: var(--text-muted);">Joined</th>
+                            <th class="text-left px-4 py-4 text-[11px] font-bold uppercase tracking-wider hidden lg:table-cell" style="color: var(--text-muted);">Shamil Hua</th>
                             <th class="text-center px-4 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: var(--text-muted);">Actions</th>
                         </tr>
                     </thead>
@@ -146,7 +145,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold text-white flex-shrink-0 transition-transform group-hover:scale-105"
-                                         style="background: linear-gradient(135deg, {{ $tenant->is_active ? '#6366f1' : '#64748b' }}, {{ $tenant->is_active ? '#8b5cf6' : '#94a3b8' }});">
+                                         style="background: linear-gradient(135deg, {{ $tenant->is_active ? '#0E7A5C' : '#64748b' }}, {{ $tenant->is_active ? '#159C74' : '#94a3b8' }});">
                                         {{ strtoupper(substr($tenant->company_name, 0, 2)) }}
                                     </div>
                                     <div class="min-w-0">
@@ -234,8 +233,8 @@
                                         
                                         <!-- View -->
                                         <a href="{{ route('super-admin.tenants.show', $tenant) }}" class="flex items-center gap-3 px-4 py-3 text-[12px] font-medium transition-colors" style="color: var(--text-secondary); border-bottom: 1px solid var(--border);" onmouseover="this.style.background='var(--accent-glow)';this.style.color='var(--text-heading)'" onmouseout="this.style.background='transparent';this.style.color='var(--text-secondary)'">
-                                            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                            View Details
+                                            <svg class="w-4 h-4 text-till-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            Detail Dekhein
                                         </a>
                                         
                                         <!-- Toggle Status -->
@@ -245,21 +244,21 @@
                                             <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium transition-colors cursor-pointer" style="color: var(--text-secondary); border-bottom: 1px solid var(--border);" onmouseover="this.style.background='var(--accent-glow)';this.style.color='var(--text-heading)'" onmouseout="this.style.background='transparent';this.style.color='var(--text-secondary)'">
                                                 @if($tenant->is_active)
                                                 <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
-                                                Deactivate
+                                                Deactivate Karein
                                                 @else
                                                 <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                Activate
+                                                Activate Karein
                                                 @endif
                                             </button>
                                         </form>
                                         
                                         <!-- Delete -->
-                                        <form action="{{ route('super-admin.tenants.destroy', $tenant) }}" method="POST" onsubmit="return confirm('⚠️ Are you sure?\n\nThis will permanently delete this tenant and ALL its data including:\n• Users\n• Products\n• Orders\n• Settings\n\nIf they have an active Stripe subscription, it will also be cancelled.\n\nThis action cannot be undone.');">
+                                        <form action="{{ route('super-admin.tenants.destroy', $tenant) }}" method="POST" onsubmit="return confirm('⚠️ Kya aap pakka hain?\n\nYe tenant aur uska SARA data hamesha ke liye delete kar dega, jaise ke:\n• Users\n• Saamaan\n• Orders\n• Settings\n\nAgar unki active Stripe subscription hai, wo bhi cancel ho jayegi.\n\nYe action wapas nahi ho sakta.');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium transition-colors cursor-pointer" style="color: var(--danger);" onmouseover="this.style.background='var(--danger-bg)'" onmouseout="this.style.background='transparent'">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                                Delete Permanently
+                                                Hamesha Ke Liye Delete Karein
                                             </button>
                                         </form>
                                     </div>
@@ -276,19 +275,19 @@
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-bold" style="color: var(--text-heading);">No tenants found</p>
+                                        <p class="text-sm font-bold" style="color: var(--text-heading);">Koi tenant nahi mila</p>
                                         <p class="text-xs mt-1.5 max-w-[250px] mx-auto leading-relaxed" style="color: var(--text-muted);">
                                             @if(request('search') || request('status') || request('billing_status') || request('plan'))
-                                                Try adjusting your search or filter criteria
+                                                Apni search ya filters change karke try karein
                                             @else
-                                                New tenant signups will appear here
+                                                Naye tenant signups yahan nazar aayenge
                                             @endif
                                         </p>
                                     </div>
                                     @if(request('search') || request('status') || request('billing_status') || request('plan'))
                                     <a href="{{ route('super-admin.tenants.index') }}" class="btn-secondary text-[12px] !px-4 !py-2">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                        Clear Filters
+                                        Filters Saaf Karein
                                     </a>
                                     @endif
                                 </div>
@@ -304,8 +303,8 @@
             <div class="px-6 py-4" style="border-top: 1px solid var(--border);">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p class="text-[12px]" style="color: var(--text-muted);">
-                        Showing <span class="font-semibold" style="color: var(--text-heading);">{{ $tenants->firstItem() }}</span> to 
-                        <span class="font-semibold" style="color: var(--text-heading);">{{ $tenants->lastItem() }}</span> of 
+                        <span class="font-semibold" style="color: var(--text-heading);">{{ $tenants->firstItem() }}</span> se 
+                        <span class="font-semibold" style="color: var(--text-heading);">{{ $tenants->lastItem() }}</span> / 
                         <span class="font-semibold" style="color: var(--text-heading);">{{ $tenants->total() }}</span> tenants
                     </p>
                     <div class="flex items-center gap-2">
@@ -324,7 +323,7 @@
                         @foreach($tenants->getUrlRange(max(1, $tenants->currentPage()-2), min($tenants->lastPage(), $tenants->currentPage()+2)) as $page => $url)
                         <a href="{{ $url }}" class="w-9 h-9 rounded-xl flex items-center justify-center text-[12px] font-bold transition-all hover:scale-105"
                             style="{{ $page == $tenants->currentPage() 
-                                ? 'background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; box-shadow: 0 4px 15px rgba(99,102,241,0.3);' 
+                                ? 'background: linear-gradient(135deg, #0E7A5C, #159C74); color: white; box-shadow: 0 4px 15px rgba(14,122,92,0.3);' 
                                 : 'background: var(--bg-glass); border: 1px solid var(--border); color: var(--text-secondary);' }}"
                             @if($page != $tenants->currentPage())
                             onmouseover="this.style.borderColor='var(--border-accent)';this.style.background='var(--accent-glow)'"

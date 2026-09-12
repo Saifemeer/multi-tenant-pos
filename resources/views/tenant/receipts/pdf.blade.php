@@ -52,7 +52,8 @@
 </head>
 <body>
 
-    <div class="center">
+    
+<div class="center">
         <p class="company-name">{{ $tenant->company_name }}</p>
         @if($tenant->address)
             <p>{{ $tenant->address }}</p>
@@ -64,13 +65,20 @@
 
     <div class="divider"></div>
 
+    @if($order->status === 'refunded')
+    <div style="text-align: center; margin: 8px 0; padding: 6px; border: 2px solid #cc0000;">
+        <p style="font-size: 13px; font-weight: bold; color: #cc0000; letter-spacing: 2px;">*** REFUND HO GAYA ***</p>
+    </div>
+    @endif
+    <div class="divider"></div>
+
     <table>
         <tr>
             <td>Receipt #:</td>
             <td class="right bold">{{ $order->order_number }}</td>
         </tr>
         <tr>
-            <td>Date:</td>
+            <td>Tareekh:</td>
             <td class="right">{{ $order->created_at->format('d M Y, h:i A') }}</td>
         </tr>
         <tr>
@@ -94,8 +102,8 @@
     <table>
         <thead>
             <tr>
-                <th>Item</th>
-                <th class="right">Qty</th>
+                <th>Saamaan</th>
+                <th class="right">Miqdar</th>
                 <th class="right">Price</th>
                 <th class="right">Total</th>
             </tr>
@@ -138,9 +146,14 @@
     </table>
 
     <div class="divider"></div>
-
+@if($order->status === 'refunded' && $order->refundedBy)
+    <div class="divider"></div>
+    <div class="center" style="font-size: 9px; color: #666;">
+        <p>Ye order refund ho chuka hai</p>
+    </div>
+    @endif
     <div class="footer">
-        <p>Thank you for your business!</p>
+        <p>Aapke business ka shukriya!</p>
         <p style="margin-top: 4px; color: #666;">Powered by SaaS POS</p>
     </div>
 

@@ -87,7 +87,7 @@ class ExpenseController extends Controller
             'receipt'      => $receiptPath,
         ]);
 
-        return back()->with('success', 'Expense successfully record ho gaya!');
+        return back()->with('success', 'Expense successfully record !');
     }
 
     public function destroy(Expense $expense)
@@ -102,6 +102,6 @@ class ExpenseController extends Controller
 
         $expense->delete();
 
-        return back()->with('success', 'Expense delete ho gaya.');
+        return back()->with('success', 'Expense delete.');
     }
 }

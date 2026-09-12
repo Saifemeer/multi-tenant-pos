@@ -98,14 +98,9 @@ Route::middleware(['auth', 'tenant.active'])->prefix('tenant')->name('tenant.')-
     Route::put('/settings/profile', [SettingsController::class, 'updateProfile'])
         ->name('settings.profile');
 
-      // ✅ Orders — sab dekh sakte hain; refund koi bhi turant kar sakta hai (reason ke saath)
+      // ✅ Orders — sab dekh sakte hain; refund sirf Admin/Manager kar sakte hain
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::post('/orders/{order}/refund', [OrderController::class, 'refund'])->name('orders.refund');
-
-     // ✅ Refund audit log — sirf admin/manager
-    Route::get('/refund-logs', [OrderController::class, 'refundLogs'])->name('refund-logs.index');
-    Route::post('/refund-logs/{refundLog}/mark-reviewed', [OrderController::class, 'markReviewed'])->name('refund-logs.mark-reviewed');
 
     // ✅ Receipt/Invoice PDF
     Route::get('/orders/{order}/receipt', [ReceiptController::class, 'view'])->name('receipts.view');
@@ -113,6 +108,13 @@ Route::middleware(['auth', 'tenant.active'])->prefix('tenant')->name('tenant.')-
 
     // ─── Admin + Manager access kar sakte hain (operations) ───────
     Route::middleware('not.cashier')->group(function () {
+        // ✅ Refund — sirf Admin/Manager (cashier khud ko refund nahi de sakta)
+        Route::post('/orders/{order}/refund', [OrderController::class, 'refund'])->name('orders.refund');
+
+        // ✅ Refund audit log — sirf admin/manager
+        Route::get('/refund-logs', [OrderController::class, 'refundLogs'])->name('refund-logs.index');
+        Route::post('/refund-logs/{refundLog}/mark-reviewed', [OrderController::class, 'markReviewed'])->name('refund-logs.mark-reviewed');
+
 // Expenses
         Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index');
         Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');

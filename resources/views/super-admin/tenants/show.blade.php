@@ -1,7 +1,7 @@
 @extends('layouts.super-admin')
 
 @section('page-title', $tenant->company_name)
-@section('page-subtitle', 'Tenant details & management')
+@section('page-subtitle', 'Tenant ki detail aur management')
 
 @section('content')
 <div class="w-full">
@@ -12,7 +12,7 @@
             <!-- Tenant Avatar -->
             <div class="relative">
                 <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-black text-white shadow-lg transition-transform hover:scale-105"
-                     style="background: linear-gradient(135deg, {{ $tenant->is_active ? '#6366f1' : '#64748b' }}, {{ $tenant->is_active ? '#8b5cf6' : '#94a3b8' }}); box-shadow: 0 8px 25px {{ $tenant->is_active ? 'rgba(99,102,241,0.3)' : 'rgba(100,116,139,0.2)' }};">
+                     style="background: linear-gradient(135deg, {{ $tenant->is_active ? '#0E7A5C' : '#64748b' }}, {{ $tenant->is_active ? '#159C74' : '#94a3b8' }}); box-shadow: 0 8px 25px {{ $tenant->is_active ? 'rgba(14,122,92,0.3)' : 'rgba(100,116,139,0.2)' }};">
                     {{ strtoupper(substr($tenant->company_name, 0, 2)) }}
                 </div>
                 <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 flex items-center justify-center {{ $tenant->is_active ? 'bg-emerald-400' : 'bg-red-400' }}" style="border-color: var(--bg-body);">
@@ -51,7 +51,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
             </svg>
-            Back to Tenants
+            Tenants Par Wapas Jayein
         </a>
     </div>
 
@@ -76,16 +76,16 @@
         <!-- Products -->
         <div class="stat-card animate-fade-in delay-2 group">
             <div class="flex items-center justify-between mb-3">
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/10 flex items-center justify-center border border-indigo-500/20 group-hover:scale-110 transition-transform duration-300">
-                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-till-500/20 to-purple-500/10 flex items-center justify-center border border-till-500/20 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-5 h-5 text-till-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                     </svg>
                 </div>
             </div>
             <p class="text-3xl font-black tracking-tight" style="color: var(--text-heading);">{{ $stats['total_products'] }}</p>
             <p class="text-xs mt-1 flex items-center gap-1" style="color: var(--text-muted);">
-                <span class="w-1 h-1 rounded-full bg-indigo-400"></span>
-                Products
+                <span class="w-1 h-1 rounded-full bg-till-400"></span>
+                Saamaan
             </p>
         </div>
 
@@ -131,29 +131,29 @@
             <div class="rounded-2xl overflow-hidden" style="background: var(--bg-card); border: 1px solid var(--border);">
                 <!-- Card Header -->
                 <div class="px-6 py-4 flex items-center gap-3" style="border-bottom: 1px solid var(--border);">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/10 flex items-center justify-center border border-indigo-500/20">
-                        <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-till-500/20 to-purple-500/10 flex items-center justify-center border border-till-500/20">
+                        <svg class="w-4 h-4 text-till-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold" style="color: var(--text-heading);">Business Information</h3>
-                        <p class="text-[11px]" style="color: var(--text-muted);">Tenant account details</p>
+                        <h3 class="text-sm font-bold" style="color: var(--text-heading);">Business Ki Maloomat</h3>
+                        <p class="text-[11px]" style="color: var(--text-muted);">Tenant account ki detail</p>
                     </div>
                 </div>
-                 <!-- ✅ NAYA: Billing & Subscription Card -->
+                 <!-- Billing & Subscription Card -->
             <div class="rounded-2xl overflow-hidden mt-6" style="background: var(--bg-card); border: 1px solid var(--border);">
                 <div class="px-6 py-4 flex items-center gap-3" style="border-bottom: 1px solid var(--border);">
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 flex items-center justify-center border border-emerald-500/20">
                         <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold" style="color: var(--text-heading);">Billing & Subscription</h3>
-                        <p class="text-[11px]" style="color: var(--text-muted);">Stripe subscription details</p>
+                        <h3 class="text-sm font-bold" style="color: var(--text-heading);">Billing Aur Subscription</h3>
+                        <p class="text-[11px]" style="color: var(--text-muted);">Stripe subscription ki detail</p>
                     </div>
                 </div>
                 <div class="p-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div class="rounded-xl p-4" style="background: var(--bg-glass); border: 1px solid var(--border);">
-                            <p class="text-[11px] font-semibold uppercase tracking-wider mb-2" style="color: var(--text-muted);">Subscription Status</p>
+                            <p class="text-[11px] font-semibold uppercase tracking-wider mb-2" style="color: var(--text-muted);">Subscription Ka Status</p>
                             @php
                                 $billingColors = [
                                     'trialing' => 'background: rgba(59,130,246,0.12); color: #60a5fa;',
@@ -180,7 +180,7 @@
                     @if($tenant->stripe_customer_id)
                     <a href="https://dashboard.stripe.com/test/customers/{{ $tenant->stripe_customer_id }}" target="_blank"
                        class="inline-flex items-center gap-1.5 mt-5 text-sm font-medium" style="color: var(--accent-light);">
-                        View in Stripe Dashboard →
+                        Stripe Dashboard Mein Dekhein →
                     </a>
                     @endif
                 </div>
@@ -217,7 +217,7 @@
                             @if($tenant->subscription_plan)
                                 <span class="badge badge-info text-[11px]">{{ $tenant->subscription_plan }}</span>
                             @else
-                                <p class="text-[13px]" style="color: var(--text-muted);">No plan selected</p>
+                                <p class="text-[13px]" style="color: var(--text-muted);">Koi plan select nahi</p>
                             @endif
                         </div>
 
@@ -225,15 +225,15 @@
                         <div class="rounded-xl p-4 transition-colors" style="background: var(--bg-glass); border: 1px solid var(--border);" onmouseover="this.style.borderColor='var(--border-accent)'" onmouseout="this.style.borderColor='var(--border)'">
                             <div class="flex items-center gap-2 mb-2">
                                 <svg class="w-3.5 h-3.5" style="color: var(--accent-light);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                <p class="text-[11px] font-semibold uppercase tracking-wider" style="color: var(--text-muted);">Trial Ends</p>
+                                <p class="text-[11px] font-semibold uppercase tracking-wider" style="color: var(--text-muted);">Trial Kab Khatam Hoga</p>
                             </div>
                             @if($tenant->trial_ends_at)
                                 <p class="text-[13px] font-semibold" style="color: var(--text-heading);">{{ $tenant->trial_ends_at->format('d M Y') }}</p>
                                 <p class="text-[10px] mt-0.5" style="color: {{ $tenant->trial_ends_at->isPast() ? 'var(--danger)' : 'var(--text-muted)' }};">
-                                    {{ $tenant->trial_ends_at->isPast() ? 'Expired ' : 'Expires ' }}{{ $tenant->trial_ends_at->diffForHumans() }}
+                                    {{ $tenant->trial_ends_at->isPast() ? 'Khatam ho gaya ' : 'Khatam hoga ' }}{{ $tenant->trial_ends_at->diffForHumans() }}
                                 </p>
                             @else
-                                <p class="text-[13px]" style="color: var(--text-muted);">No trial period</p>
+                                <p class="text-[13px]" style="color: var(--text-muted);">Koi trial period nahi</p>
                             @endif
                         </div>
 
@@ -241,7 +241,7 @@
                         <div class="rounded-xl p-4 transition-colors" style="background: var(--bg-glass); border: 1px solid var(--border);" onmouseover="this.style.borderColor='var(--border-accent)'" onmouseout="this.style.borderColor='var(--border)'">
                             <div class="flex items-center gap-2 mb-2">
                                 <svg class="w-3.5 h-3.5" style="color: var(--accent-light);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                <p class="text-[11px] font-semibold uppercase tracking-wider" style="color: var(--text-muted);">Joined Date</p>
+                                <p class="text-[11px] font-semibold uppercase tracking-wider" style="color: var(--text-muted);">Shamil Hone Ki Tareekh</p>
                             </div>
                             <p class="text-[13px] font-semibold" style="color: var(--text-heading);">{{ $tenant->created_at->format('d M Y') }}</p>
                             <p class="text-[10px] mt-0.5" style="color: var(--text-muted);">{{ $tenant->created_at->diffForHumans() }}</p>
@@ -270,8 +270,8 @@
                             <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                         </div>
                         <div>
-                            <h3 class="text-sm font-bold" style="color: var(--text-heading);">Quick Actions</h3>
-                            <p class="text-[11px]" style="color: var(--text-muted);">Manage this tenant</p>
+                            <h3 class="text-sm font-bold" style="color: var(--text-heading);">Foran Ke Kaam</h3>
+                            <p class="text-[11px]" style="color: var(--text-muted);">Is tenant ko manage karein</p>
                         </div>
                     </div>
                 </div>
@@ -288,8 +288,8 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
                             </div>
                             <div class="flex-1 text-left">
-                                <p class="text-[13px] font-semibold">Deactivate Tenant</p>
-                                <p class="text-[10px] opacity-70">Suspend this business</p>
+                                <p class="text-[13px] font-semibold">Tenant Deactivate Karein</p>
+                                <p class="text-[10px] opacity-70">Ye business suspend karein</p>
                             </div>
                         </button>
                         @else
@@ -298,21 +298,21 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </div>
                             <div class="flex-1 text-left">
-                                <p class="text-[13px] font-semibold">Activate Tenant</p>
-                                <p class="text-[10px] opacity-70">Enable this business</p>
+                                <p class="text-[13px] font-semibold">Tenant Activate Karein</p>
+                                <p class="text-[10px] opacity-70">Ye business enable karein</p>
                             </div>
                         </button>
                         @endif
                     </form>
 
-                    <!-- View as Tenant (optional) -->
+                    <!-- View as Tenant -->
                     <a href="#" class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all group" style="background: var(--bg-glass); border: 1px solid var(--border);" onmouseover="this.style.background='var(--accent-glow)';this.style.borderColor='var(--border-accent)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='var(--bg-glass)';this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
                         <div class="w-9 h-9 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform" style="background: var(--accent-glow); border: 1px solid var(--border-accent);">
                             <svg class="w-4 h-4" style="color: var(--accent-light);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         </div>
                         <div class="flex-1 text-left">
-                            <p class="text-[13px] font-semibold" style="color: var(--text-heading);">View Dashboard</p>
-                            <p class="text-[10px]" style="color: var(--text-muted);">See tenant's view</p>
+                            <p class="text-[13px] font-semibold" style="color: var(--text-heading);">Dashboard Dekhein</p>
+                            <p class="text-[10px]" style="color: var(--text-muted);">Tenant ka view dekhein</p>
                         </div>
                         <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </a>
@@ -323,8 +323,8 @@
         <svg class="w-4 h-4" style="color: var(--accent-light);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
     </div>
     <div class="flex-1 text-left">
-        <p class="text-[13px] font-semibold" style="color: var(--text-heading);">Edit Details</p>
-        <p class="text-[10px]" style="color: var(--text-muted);">Modify tenant info</p>
+        <p class="text-[13px] font-semibold" style="color: var(--text-heading);">Detail Edit Karein</p>
+        <p class="text-[10px]" style="color: var(--text-muted);">Tenant ki maloomat badlein</p>
     </div>
     <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
 </a>
@@ -335,7 +335,7 @@
                     </div>
 
                     <!-- Delete -->
-                    <form action="{{ route('super-admin.tenants.destroy', $tenant) }}" method="POST" onsubmit="return confirm('⚠️ DANGER ZONE!\n\nThis will permanently delete:\n• {{ $tenant->company_name }}\n• All users ({{ $stats['total_users'] }})\n• All products ({{ $stats['total_products'] }})\n• All orders ({{ $stats['total_orders'] }})\n\nThis action CANNOT be undone.\n\nType DELETE to confirm.');">
+                    <form action="{{ route('super-admin.tenants.destroy', $tenant) }}" method="POST" onsubmit="return confirm('⚠️ KHATARNAK ZONE!\n\nYe hamesha ke liye delete kar dega:\n• {{ $tenant->company_name }}\n• Sare users ({{ $stats['total_users'] }})\n• Sara saamaan ({{ $stats['total_products'] }})\n• Sare orders ({{ $stats['total_orders'] }})\n\nYe action WAPAS nahi ho sakta.\n\nConfirm karne ke liye DELETE likhein.');">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all cursor-pointer group" style="background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.1); color: var(--danger);" onmouseover="this.style.background='rgba(239,68,68,0.1)';this.style.borderColor='rgba(239,68,68,0.25)'" onmouseout="this.style.background='rgba(239,68,68,0.04)';this.style.borderColor='rgba(239,68,68,0.1)'">
@@ -343,8 +343,8 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                             </div>
                             <div class="flex-1 text-left">
-                                <p class="text-[13px] font-semibold">Delete Permanently</p>
-                                <p class="text-[10px] opacity-60">Cannot be undone</p>
+                                <p class="text-[13px] font-semibold">Hamesha Ke Liye Delete Karein</p>
+                                <p class="text-[10px] opacity-60">Wapas nahi ho sakta</p>
                             </div>
                         </button>
                     </form>

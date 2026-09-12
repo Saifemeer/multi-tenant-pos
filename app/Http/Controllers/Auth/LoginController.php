@@ -34,8 +34,8 @@ class LoginController extends Controller
             $minutes = ceil($seconds / 60);
 
             throw ValidationException::withMessages([
-                'email' => "Bahut zyada galat attempts ho gaye. Meherbani karke {$minutes} minute baad dubara try karein.",
-            ]);
+    'email' => "Too many failed attempts. Please try again in {$minutes} minute(s).",
+]);
         }
 
         if (!Auth::attempt($credentials)) {
@@ -45,10 +45,10 @@ class LoginController extends Controller
             $remaining = 5 - RateLimiter::attempts($throttleKey);
 
             return back()->withErrors([
-                'email' => $remaining > 0
-                    ? "Email ya password galat hai. {$remaining} attempts baaki hain."
-                    : 'Bahut zyada galat attempts ho gaye. 5 minute baad try karein.',
-            ])->onlyInput('email');
+    'email' => $remaining > 0
+        ? "Incorrect email or password. {$remaining} attempt(s) remaining."
+        : 'Too many failed attempts. Please try again in 5 minutes.',
+])->onlyInput('email');
         }
 
         // ✅ Login successful — rate limit clear karo
@@ -56,21 +56,21 @@ class LoginController extends Controller
 
         $user = Auth::user();
 
-        if (!$user->is_active) {
-            Auth::logout();
-            return back()->withErrors([
-                'email' => 'Aapka account deactivate kar diya gaya hai. Admin se contact karein.',
-            ])->onlyInput('email');
-        }
+       if (!$user->is_active) {
+    Auth::logout();
+    return back()->withErrors([
+        'email' => 'Your account has been deactivated. Please contact the admin.',
+    ])->onlyInput('email');
+}
 
         if (!$user->isSuperAdmin()) {
             $tenant = $user->tenant;
-            if (!$tenant || !$tenant->is_active) {
-                Auth::logout();
-                return back()->withErrors([
-                    'email' => 'Aapka business account currently active nahi hai. Support se contact karein.',
-                ])->onlyInput('email');
-            }
+           if (!$tenant || !$tenant->is_active) {
+    Auth::logout();
+    return back()->withErrors([
+        'email' => 'Your business account is currently inactive. Please contact support.',
+    ])->onlyInput('email');
+}
         }
 
         $request->session()->regenerate();
@@ -94,7 +94,7 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('login')
-            ->with('success', 'Aap logout ho gaye hain!');
-    }
+       return redirect()->route('login')
+    ->with('success', 'You have been logged out!');
+}
 }

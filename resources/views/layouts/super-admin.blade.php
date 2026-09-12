@@ -7,7 +7,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1, viewport-fit=cover"
     >
-
+<link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <title>@yield('title', 'Super Admin') · POS Platform</title>
 
     <!-- Prevent theme flash -->
@@ -29,7 +29,18 @@
         })();
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        till: { 50: '#EAF6F1', 100: '#CFEBE0', 200: '#9FD7C0', 300: '#6CC2A0', 400: '#3DAB80', 500: '#0E7A5C', 600: '#0B6049', 700: '#084A39', 800: '#063A2D', 900: '#052C23' },
+                    },
+                }
+            }
+        }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -110,7 +121,7 @@
         ========================================================= */
         * {
             scrollbar-width: thin;
-            scrollbar-color: rgba(99, 102, 241, 0.35) transparent;
+            scrollbar-color: rgba(14, 122, 92, 0.35) transparent;
         }
 
         ::-webkit-scrollbar {
@@ -123,12 +134,12 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: rgba(99, 102, 241, 0.3);
+            background: rgba(14, 122, 92, 0.3);
             border-radius: 999px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(99, 102, 241, 0.55);
+            background: rgba(14, 122, 92, 0.55);
         }
 
         /* =========================================================
@@ -147,16 +158,16 @@
 
             --border: rgba(255, 255, 255, 0.065);
             --border-hover: rgba(255, 255, 255, 0.13);
-            --border-accent: rgba(99, 102, 241, 0.35);
+            --border-accent: rgba(14, 122, 92, 0.35);
 
             --text-heading: #ffffff;
             --text-primary: #f1f5f9;
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
 
-            --accent: #6366f1;
-            --accent-light: #818cf8;
-            --accent-glow: rgba(99, 102, 241, 0.15);
+            --accent: #0E7A5C;
+            --accent-light: #4fb894;
+            --accent-glow: rgba(14, 122, 92, 0.15);
 
             --danger: #f87171;
             --danger-bg: rgba(239, 68, 68, 0.08);
@@ -181,16 +192,16 @@
 
             --border: rgba(15, 23, 42, 0.08);
             --border-hover: rgba(15, 23, 42, 0.14);
-            --border-accent: rgba(99, 102, 241, 0.28);
+            --border-accent: rgba(14, 122, 92, 0.28);
 
             --text-heading: #0f172a;
             --text-primary: #334155;
             --text-secondary: #64748b;
             --text-muted: #94a3b8;
 
-            --accent: #6366f1;
-            --accent-light: #6366f1;
-            --accent-glow: rgba(99, 102, 241, 0.08);
+            --accent: #0E7A5C;
+            --accent-light: #0E7A5C;
+            --accent-glow: rgba(14, 122, 92, 0.08);
 
             --danger: #ef4444;
             --danger-bg: rgba(239, 68, 68, 0.06);
@@ -232,11 +243,11 @@
         @keyframes pulseGlow {
             0%,
             100% {
-                box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
+                box-shadow: 0 0 15px rgba(14, 122, 92, 0.15);
             }
 
             50% {
-                box-shadow: 0 0 30px rgba(99, 102, 241, 0.28);
+                box-shadow: 0 0 30px rgba(14, 122, 92, 0.28);
             }
         }
 
@@ -331,7 +342,7 @@
             background: linear-gradient(
                 180deg,
                 transparent,
-                rgba(99, 102, 241, 0.25),
+                rgba(14, 122, 92, 0.25),
                 transparent
             );
         }
@@ -430,9 +441,9 @@
 
             background: linear-gradient(
                 135deg,
-                #6366f1,
-                #8b5cf6,
-                #a78bfa
+                #0E7A5C,
+                #159C74,
+                #6CC2A0
             );
         }
 
@@ -507,8 +518,8 @@
 
             background: linear-gradient(
                 135deg,
-                rgba(99, 102, 241, 0.09),
-                rgba(139, 92, 246, 0.045)
+                rgba(14, 122, 92, 0.09),
+                rgba(21, 156, 116, 0.045)
             );
 
             transition: opacity 0.25s ease;
@@ -529,16 +540,16 @@
 
         .nav-link.active {
             color: var(--text-heading);
-            border-color: rgba(99, 102, 241, 0.22);
+            border-color: rgba(14, 122, 92, 0.22);
 
             background: linear-gradient(
                 135deg,
-                rgba(99, 102, 241, 0.16),
-                rgba(139, 92, 246, 0.1)
+                rgba(14, 122, 92, 0.16),
+                rgba(21, 156, 116, 0.1)
             );
 
             box-shadow:
-                0 0 20px rgba(99, 102, 241, 0.08),
+                0 0 20px rgba(14, 122, 92, 0.08),
                 inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
@@ -556,8 +567,8 @@
 
             background: linear-gradient(
                 180deg,
-                #6366f1,
-                #8b5cf6
+                #0E7A5C,
+                #159C74
             );
         }
 
@@ -651,8 +662,8 @@
             border: 2px solid var(--bg-header);
             border-radius: 50%;
 
-            background: #6366f1;
-            box-shadow: 0 0 8px rgba(99, 102, 241, 0.7);
+            background: #0E7A5C;
+            box-shadow: 0 0 8px rgba(14, 122, 92, 0.7);
         }
 
         /* =========================================================
@@ -692,11 +703,11 @@
 
             background: linear-gradient(
                 135deg,
-                #6366f1,
-                #8b5cf6
+                #0E7A5C,
+                #159C74
             );
 
-            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+            box-shadow: 0 2px 8px rgba(14, 122, 92, 0.35);
 
             transition:
                 transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55),
@@ -809,7 +820,7 @@
             background: linear-gradient(
                 90deg,
                 transparent,
-                rgba(99, 102, 241, 0.45),
+                rgba(14, 122, 92, 0.45),
                 transparent
             );
 
@@ -863,7 +874,7 @@
         .badge-info {
             color: var(--accent-light);
             background: var(--accent-glow);
-            border: 1px solid rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(14, 122, 92, 0.2);
         }
 
         .badge-warning {
@@ -956,16 +967,16 @@
 
             background: linear-gradient(
                 135deg,
-                #6366f1,
-                #8b5cf6
+                #0E7A5C,
+                #159C74
             );
 
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+            box-shadow: 0 4px 15px rgba(14, 122, 92, 0.25);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
+            box-shadow: 0 8px 25px rgba(14, 122, 92, 0.35);
         }
 
         .btn-secondary {
@@ -1227,7 +1238,7 @@
                 <div class="flex items-center justify-between gap-3">
                     <div class="flex items-center gap-3 min-w-0">
                         <div class="relative flex-shrink-0">
-                            <div class="logo-icon w-11 h-11 bg-gradient-to-br from-indigo-500 via-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20 rotate-3 hover:rotate-0 transition-transform duration-300">
+                            <div class="logo-icon w-11 h-11 bg-gradient-to-br from-till-500 via-till-400 to-till-600 rounded-2xl flex items-center justify-center shadow-lg shadow-till-500/20 rotate-3 hover:rotate-0 transition-transform duration-300">
                                 <svg
                                     class="w-5 h-5 text-white"
                                     fill="none"
@@ -1255,7 +1266,7 @@
                                 class="font-extrabold text-[15px] tracking-tight truncate"
                                 style="color: var(--text-heading);"
                             >
-                                Super<span class="text-indigo-500">Admin</span>
+                                Super<span class="text-till-500">Admin</span>
                             </p>
 
                             <p
@@ -1294,7 +1305,7 @@
             <!-- Navigation -->
             <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
 
-                <div class="section-label mt-1 mb-3">Overview</div>
+                <div class="section-label mt-1 mb-3">Jaiza</div>
 
                 <a href="{{ route('super-admin.dashboard') }}"
                    class="nav-link {{ request()->routeIs('super-admin.dashboard') ? 'active' : '' }}">
@@ -1304,7 +1315,7 @@
                     Dashboard
                 </a>
 
-                <div class="section-label mt-6 mb-3">Management</div>
+                <div class="section-label mt-6 mb-3">Intezaam</div>
 
                 <a href="{{ route('super-admin.tenants.index') }}"
                    class="nav-link {{ request()->routeIs('super-admin.tenants.*') ? 'active' : '' }}">
@@ -1312,7 +1323,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2M5 21H3m16 0h-2M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4a1 1 0 011-1h0a1 1 0 011 1v4"/>
                     </svg>
                     Tenants
-                    <span class="ml-auto badge badge-info text-[10px] py-0.5 px-2">All</span>
+                    <span class="ml-auto badge badge-info text-[10px] py-0.5 px-2">Sab</span>
                 </a>
             </nav>
 
@@ -1331,12 +1342,12 @@
                             class="truncate"
                             style="color: var(--text-muted);"
                         >
-                            System Status
+                            System Ka Status
                         </span>
 
                         <span class="badge badge-success text-[10px] py-0.5 px-2">
                             <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1.5"></span>
-                            Operational
+                            Chalu Hai
                         </span>
                     </div>
                 </div>
@@ -1344,7 +1355,7 @@
                 <!-- User -->
                 <div class="flex items-center gap-3 mb-3">
                     <div class="avatar-ring">
-                        <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        <div class="w-9 h-9 bg-gradient-to-br from-till-500 to-till-700 rounded-full flex items-center justify-center text-white text-xs font-bold">
                             {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                         </div>
                     </div>
@@ -1390,7 +1401,7 @@
                             />
                         </svg>
 
-                        <span>Sign Out</span>
+                        <span>Logout</span>
                     </button>
                 </form>
             </div>
@@ -1412,7 +1423,7 @@
                                 id="menuButton"
                                 class="mobile-menu-button"
                                 onclick="openSidebar()"
-                                aria-label="Open navigation menu"
+                                aria-label="Menu kholein"
                                 aria-controls="sidebar"
                                 aria-expanded="false"
                             >
@@ -1472,7 +1483,7 @@
                             <button
                                 type="button"
                                 class="header-icon-button hidden md:flex"
-                                aria-label="Search"
+                                aria-label="Search karein"
                             >
                                 <svg
                                     class="w-4 h-4"
@@ -1583,7 +1594,7 @@
 
                             <div class="flex-1 min-w-0">
                                 <p class="font-semibold text-sm">
-                                    Success!
+                                    Kamyab!
                                 </p>
 
                                 <p class="text-xs opacity-80 mt-0.5 break-words">
@@ -1595,7 +1606,7 @@
                                 type="button"
                                 onclick="dismissAlert(this.closest('.alert'))"
                                 class="opacity-60 hover:opacity-100 transition-opacity flex-shrink-0"
-                                aria-label="Dismiss success message"
+                                aria-label="Message hatayein"
                             >
                                 <svg
                                     class="w-4 h-4"
@@ -1640,7 +1651,7 @@
 
                             <div class="flex-1 min-w-0">
                                 <p class="font-semibold text-sm">
-                                    Error!
+                                    Ghalti!
                                 </p>
 
                                 <p class="text-xs opacity-80 mt-0.5 break-words">
@@ -1652,7 +1663,7 @@
                                 type="button"
                                 onclick="dismissAlert(this.closest('.alert'))"
                                 class="opacity-60 hover:opacity-100 transition-opacity flex-shrink-0"
-                                aria-label="Dismiss error message"
+                                aria-label="Message hatayein"
                             >
                                 <svg
                                     class="w-4 h-4"
@@ -1694,7 +1705,7 @@
                             class="text-[11px]"
                             style="color: var(--text-muted);"
                         >
-                            Platform v2.0 • Built with 💜
+                            Platform v2.0
                         </p>
                     </div>
                 </div>
@@ -1739,8 +1750,8 @@
                 themeToggleButton.setAttribute(
                     'aria-label',
                     theme === 'dark'
-                        ? 'Switch to light theme'
-                        : 'Switch to dark theme'
+                        ? 'Light theme par jayein'
+                        : 'Dark theme par jayein'
                 );
             }
         }

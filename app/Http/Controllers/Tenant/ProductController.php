@@ -31,11 +31,11 @@ class ProductController extends Controller
 
         // ✅ Plan-based product limit check
         if ($tenant->hasReachedProductLimit()) {
-            return redirect()->back()->with(
-                'error',
-                'Aapki "' . ucfirst($tenant->subscription_plan) . '" plan mein sirf ' . $tenant->productLimit() . ' products allowed hain. Zyada products add karne ke liye plan upgrade karein.'
-            );
-        }
+    return redirect()->back()->with(
+        'error',
+        'Your "' . ucfirst($tenant->subscription_plan) . '" plan only allows ' . $tenant->productLimit() . ' products. Please upgrade your plan to add more products.'
+    );
+}
 
         $request->validate([
             'name'          => 'required|string|max:255',
@@ -76,7 +76,7 @@ class ProductController extends Controller
             'description'    => $request->description,
         ]);
 
-        return redirect()->back()->with('success', 'Product successfully add ho gaya!');
+        return redirect()->back()->with('success', 'Product added successfully!');
     }
 
     // ============================================
@@ -95,7 +95,14 @@ class ProductController extends Controller
     {
         $request->validate([
             'name'          => 'required|string|max:255',
-            'category_id'   => 'nullable|exists:categories,id',
+            'category_id'   => [
+                'nullable',
+                Rule::exists('categories', 'id')
+                    ->where(fn ($query) => $query->where(
+                        'tenant_id',
+                        auth()->user()->tenant_id
+                    )),
+            ],
             'price'         => 'required|numeric|min:0',
             'cost_price'    => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
@@ -128,7 +135,7 @@ class ProductController extends Controller
             'is_active'      => $request->has('is_active'),
         ]);
 
-        return redirect()->back()->with('success', 'Product successfully update ho gaya!');
+        return redirect()->back()->with('success', 'Product updated successfully!');
     }
 
     // ============================================
@@ -143,7 +150,7 @@ class ProductController extends Controller
 
         $product->delete();
 
-        return redirect()->back()->with('success', 'Product delete ho gaya!');
+       return redirect()->back()->with('success', 'Product deleted successfully!');
     }
 
     // ============================================
@@ -184,9 +191,9 @@ public function checkout(Request $request)
 
         $cartItems = json_decode($request->cart, true);
 
-        if (empty($cartItems)) {
-            return redirect()->back()->with('error', 'Cart khali hai!');
-        }
+       if (empty($cartItems)) {
+    return redirect()->back()->with('error', 'Cart is empty!');
+}
 
         $tenantId = auth()->user()->tenant_id;
 
@@ -202,11 +209,11 @@ public function checkout(Request $request)
                                       ->firstOrFail();
 
                     if ($product->stock_quantity < $item['quantity']) {
-                        throw new \Exception(
-                            '"' . $product->name . '" ka stock kam hai! ' .
-                            'Available: ' . $product->stock_quantity
-                        );
-                    }
+    throw new \Exception(
+        '"' . $product->name . '" is low on stock! ' .
+        'Available: ' . $product->stock_quantity
+    );
+}
 
                     $itemTotal = $product->price * $item['quantity'];
                     $subtotal += $itemTotal;
@@ -222,8 +229,8 @@ public function checkout(Request $request)
                 }
 // ✅ Credit payment ke liye customer zaroori hai
                 if ($request->payment_method === 'credit' && !$request->customer_id) {
-                    throw new \Exception('Udhaar (credit) dene ke liye customer select karna zaroori hai.');
-                }
+    throw new \Exception('You must select a customer to give credit.');
+}
                 $manualDiscount = $request->discount ?? 0;
 
                 // ✅ Loyalty points redemption handle karo
@@ -241,12 +248,12 @@ public function checkout(Request $request)
                         $minRedeem = config('loyalty.min_redeem');
 
                         if ($pointsToRedeem < $minRedeem) {
-                            throw new \Exception("Kam se kam {$minRedeem} points chahiye redeem karne ke liye.");
-                        }
+    throw new \Exception("A minimum of {$minRedeem} points is required to redeem.");
+}
 
                         if ($pointsToRedeem > $customer->loyalty_points) {
-                            throw new \Exception('Customer ke paas itne points nahi hain.');
-                        }
+    throw new \Exception('This customer does not have enough points.');
+}
 
                         $pointValue = config('loyalty.point_value');
                         $pointsDiscount = $pointsToRedeem * $pointValue;
@@ -307,7 +314,8 @@ public function checkout(Request $request)
             });
 
             return redirect()->route('tenant.pos')
-                ->with('success', 'Bill successfully generate ho gaya! Order #' . $order->order_number);
+    ->with('success', 'Bill generated successfully! Order #' . $order->order_number);
+
 
         } catch (\Exception $e) {
             return redirect()->back()
@@ -334,6 +342,6 @@ public function checkout(Request $request)
             $product->decrement('stock_quantity', $request->quantity);
         }
 
-        return back()->with('success', 'Stock successfully update ho gaya!');
+       return back()->with('success', 'Stock updated successfully!');
     }
 }

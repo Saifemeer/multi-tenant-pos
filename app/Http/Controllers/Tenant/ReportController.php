@@ -19,9 +19,9 @@ class ReportController extends Controller
         $tenant = auth()->user()->tenant;
 
         if (!$tenant->canAccessReports()) {
-            return redirect()->route('tenant.dashboard')
-                ->with('error', 'Reports & Analytics sirf Business ya Enterprise plan mein available hai. Apna plan upgrade karein.');
-        }
+    return redirect()->route('tenant.dashboard')
+        ->with('error', 'Reports & Analytics is only available on the Business or Enterprise plan. Please upgrade your plan.');
+}
 
         $todayRevenue = Order::completed()
             ->whereDate('created_at', today())

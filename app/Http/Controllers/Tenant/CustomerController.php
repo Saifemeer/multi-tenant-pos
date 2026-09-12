@@ -146,9 +146,9 @@ class CustomerController extends Controller
             abort(403);
         }
 
-        if ($customer->credit_balance <= 0) {
-            return back()->with('error', 'Is customer pe koi udhaar baaki nahi hai.');
-        }
+       if ($customer->credit_balance <= 0) {
+    return back()->with('error', 'This customer has no outstanding credit.');
+}
 
         $validated = $request->validate([
             'amount' => [
@@ -161,10 +161,10 @@ class CustomerController extends Controller
 
         $customer->decrement('credit_balance', $validated['amount']);
 
-        return back()->with(
-            'success',
-            'Payment record ho gayi! Naya balance: Rs. ' . number_format($customer->fresh()->credit_balance, 2)
-        );
+       return back()->with(
+    'success',
+    'Payment recorded! New balance: Rs. ' . number_format($customer->fresh()->credit_balance, 2)
+);
     }
 
     /**

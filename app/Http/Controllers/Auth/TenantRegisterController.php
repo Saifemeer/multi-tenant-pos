@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 use Stripe\Stripe;
 use Stripe\Checkout\Session as StripeSession;
 use Stripe\Customer as StripeCustomer;
@@ -28,6 +30,20 @@ class TenantRegisterController extends Controller
 
     public function register(Request $request)
     {
+        // ✅ Rate limit — 5 signups per IP per hour (Stripe calls + fake tenants dono se bachne ke liye)
+        $throttleKey = 'register|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            $minutes = ceil($seconds / 60);
+
+            throw ValidationException::withMessages([
+                'email' => "Too many signup attempts from this device. Please try again in {$minutes} minute(s).",
+            ]);
+        }
+
+        RateLimiter::hit($throttleKey, 3600); // 1 hour window
+
         $request->validate([
             'company_name'      => 'required|string|max:255',
             'business_category' => 'required|string|max:255',
@@ -56,9 +72,9 @@ class TenantRegisterController extends Controller
             } catch (\Exception $e) {
                 Log::error('Stripe customer creation failed: ' . $e->getMessage());
 
-                return back()->withErrors([
-                    'email' => 'Payment system se connect nahi ho paya. Thodi der baad try karein ya Starter (free) plan choose karein.',
-                ])->withInput();
+               return back()->withErrors([
+    'email' => 'Could not connect to the payment system. Please try again shortly, or choose the Starter (free) plan.',
+])->withInput();
             }
         }
 
@@ -102,9 +118,9 @@ class TenantRegisterController extends Controller
             Log::error('Tenant registration failed: ' . $e->getMessage());
 
             return back()->withErrors([
-                'email' => 'Registration mein masla hua. Dubara try karein.',
-            ])->withInput();
-        }
+    'email' => 'There was a problem with registration. Please try again.',
+])->withInput();
+}
 
         Auth::login($user);
 
@@ -143,9 +159,9 @@ class TenantRegisterController extends Controller
 
             // Tenant/user already ban chuke hain (DB transaction mein) — unko free/trialing rehne do
             // User ko dashboard bhej do, payment baad mein complete karne ka option de sakte ho
-            return redirect()->route('tenant.dashboard')
-                ->with('error', 'Account ban gaya hai, lekin payment page load nahi ho saka. Aap baad mein settings se subscription complete kar sakte hain.');
-        }
+           return redirect()->route('tenant.dashboard')
+    ->with('error', 'Your account was created, but the payment page failed to load. You can complete your subscription later from settings.');
+}
     }
 
     // ============================================
